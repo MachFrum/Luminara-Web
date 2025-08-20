@@ -1,58 +1,35 @@
-import { CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserAttribute } from 'amazon-cognito-identity-js';
+import { Auth } from 'aws-amplify';
 import { User } from '../../types';
 
-// These would be your actual AWS Cognito pool configuration
-const poolData = {
-  UserPoolId: process.env.REACT_APP_COGNITO_USER_POOL_ID || 'us-east-1_example',
-  ClientId: process.env.REACT_APP_COGNITO_CLIENT_ID || 'example-client-id',
+// Helper function to map Cognito attributes to our User type
+const mapCognitoUserToAppUser = (cognitoUser: any): User => {
+  const attributes = cognitoUser.attributes;
+  // NOTE: Once you set up your Cognito User Pool, make sure the custom attributes
+  // like level, rank, totalPoints, etc., are defined and mapped correctly.
+  return {
+    id: attributes.sub,
+    email: attributes.email,
+    firstName: attributes.given_name || 'John',
+    lastName: attributes.family_name || 'Doe',
+    level: parseInt(attributes['custom:level'] || '1', 10),
+    rank: attributes['custom:rank'] || 'Beginner',
+    totalPoints: parseInt(attributes['custom:totalPoints'] || '0', 10),
+    streak: parseInt(attributes['custom:streak'] || '0', 10),
+    hoursLearned: parseInt(attributes['custom:hoursLearned'] || '0', 10),
+    problemsSolved: parseInt(attributes['custom:problemsSolved'] || '0', 10),
+    createdAt: attributes.created_at || new Date().toISOString(),
+    lastLoginAt: attributes.last_login_at || new Date().toISOString(),
+  };
 };
 
-const userPool = new CognitoUserPool(poolData);
-
 export const signIn = async (email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    const authenticationData = {
-      Username: email,
-      Password: password,
-    };
-
-    const authenticationDetails = new AuthenticationDetails(authenticationData);
-
-    const userData = {
-      Username: email,
-      Pool: userPool,
-    };
-
-    const cognitoUser = new CognitoUser(userData);
-
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
-        const accessToken = result.getAccessToken().getJwtToken();
-        localStorage.setItem('accessToken', accessToken);
-        
-        // Mock user data - in real implementation, you'd get this from Cognito attributes
-        const user: User = {
-          id: result.getAccessToken().payload.sub,
-          email,
-          firstName: 'John',
-          lastName: 'Doe',
-          level: 5,
-          rank: 'Intermediate',
-          totalPoints: 1250,
-          streak: 7,
-          hoursLearned: 24,
-          problemsSolved: 85,
-          createdAt: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-        };
-        
-        resolve(user);
-      },
-      onFailure: (err) => {
-        reject(err);
-      },
-    });
-  });
+  try {
+    const cognitoUser = await Auth.signIn(email, password);
+    return mapCognitoUserToAppUser(cognitoUser);
+  } catch (error) {
+    console.error('Error signing in', error);
+    throw error;
+  }
 };
 
 export const signUp = async (
@@ -61,106 +38,73 @@ export const signUp = async (
   email: string,
   password: string
 ): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    const attributeList = [
-      new CognitoUserAttribute({ Name: 'email', Value: email }),
-      new CognitoUserAttribute({ Name: 'given_name', Value: firstName }),
-      new CognitoUserAttribute({ Name: 'family_name', Value: lastName }),
-    ];
-
-    userPool.signUp(email, password, attributeList, [], (err, result) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      // In a real implementation, you might need email verification
-      // For demo purposes, we'll create a mock user
-      const user: User = {
-        id: result?.userSub || 'new-user',
+  try {
+    const { user } = await Auth.signUp({
+      username: email,
+      password,
+      attributes: {
         email,
-        firstName,
-        lastName,
-        level: 1,
-        rank: 'Beginner',
-        totalPoints: 0,
-        streak: 0,
-        hoursLearned: 0,
-        problemsSolved: 0,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-      };
-
-      resolve(user);
+        given_name: firstName,
+        family_name: lastName,
+        // You can add custom attributes here if they are defined in your User Pool
+      },
     });
-  });
+    // For this example, we'll return a mock user object after sign-up.
+    // In a real app, you might need email verification before the user can sign in.
+    return {
+      id: user.userId,
+      email,
+      firstName,
+      lastName,
+      level: 1,
+      rank: 'Beginner',
+      totalPoints: 0,
+      streak: 0,
+      hoursLearned: 0,
+      problemsSolved: 0,
+      createdAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error('Error signing up', error);
+    throw error;
+  }
 };
 
 export const signOut = async (): Promise<void> => {
-  const cognitoUser = userPool.getCurrentUser();
-  if (cognitoUser) {
-    cognitoUser.signOut();
+  try {
+    await Auth.signOut();
+  } catch (error) {
+    console.error('Error signing out', error);
+    throw error;
   }
-  localStorage.removeItem('accessToken');
 };
 
 export const getCurrentUser = async (): Promise<User | null> => {
-  return new Promise((resolve, reject) => {
-    const cognitoUser = userPool.getCurrentUser();
-
-    if (!cognitoUser) {
-      resolve(null);
-      return;
-    }
-
-    cognitoUser.getSession((err: any, session: any) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      if (!session.isValid()) {
-        resolve(null);
-        return;
-      }
-
-      // Mock user data - in real implementation, you'd get this from Cognito attributes
-      const user: User = {
-        id: session.getAccessToken().payload.sub,
-        email: session.getAccessToken().payload.username || 'user@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        level: 5,
-        rank: 'Intermediate',
-        totalPoints: 1250,
-        streak: 7,
-        hoursLearned: 24,
-        problemsSolved: 85,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-      };
-
-      resolve(user);
-    });
-  });
+  try {
+    const cognitoUser = await Auth.currentAuthenticatedUser();
+    return mapCognitoUserToAppUser(cognitoUser);
+  } catch (error) {
+    // Not signed in
+    return null;
+  }
 };
 
 export const forgotPassword = async (email: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const userData = {
-      Username: email,
-      Pool: userPool,
-    };
+  try {
+    await Auth.forgotPassword(email);
+  } catch (error) {
+    console.error('Error sending password reset code', error);
+    throw error;
+  }
+};
 
-    const cognitoUser = new CognitoUser(userData);
-
-    cognitoUser.forgotPassword({
-      onSuccess: () => {
-        resolve();
-      },
-      onFailure: (err) => {
-        reject(err);
-      },
-    });
-  });
+// Example of how to handle password reset completion
+export const forgotPasswordSubmit = async (email: string, code: string, newPassword: string): Promise<void> => {
+  try {
+    await Auth.forgotPasswordSubmit(email, code, newPassword);
+  } catch (error) {
+    console.error('Error resetting password', error);
+    throw error;
+  }
 };

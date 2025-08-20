@@ -1,67 +1,57 @@
-import AWS from 'aws-sdk';
+import { Storage } from 'aws-amplify';
 
-// Configure AWS SDK
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-  region: process.env.REACT_APP_AWS_REGION || 'us-east-1',
-});
-
-const s3 = new AWS.S3();
-
-const BUCKET_NAME = process.env.REACT_APP_S3_BUCKET_NAME || 'luminara-uploads';
-
-export const getPresignedUrl = async (fileName: string, fileType: string): Promise<string> => {
-  const params = {
-    Bucket: BUCKET_NAME,
-    Key: `problem-images/${Date.now()}-${fileName}`,
-    Expires: 60 * 5, // 5 minutes
-    ContentType: fileType,
-  };
-
+/**
+ * Uploads a file to the S3 bucket managed by Amplify.
+ * 
+ * @param file The file to upload.
+ * @param progressCallback An optional callback to track upload progress.
+ * @returns The key of the uploaded file.
+ */
+export const uploadFile = async (
+  file: File,
+  progressCallback?: (progress: { loaded: number; total: number }) => void
+): Promise<string> => {
   try {
-    const url = await s3.getSignedUrlPromise('putObject', params);
-    return url;
-  } catch (error) {
-    throw new Error('Failed to generate presigned URL');
-  }
-};
-
-export const uploadFile = async (file: File): Promise<string> => {
-  try {
-    const presignedUrl = await getPresignedUrl(file.name, file.type);
-    
-    const response = await fetch(presignedUrl, {
-      method: 'PUT',
-      body: file,
-      headers: {
-        'Content-Type': file.type,
-      },
+    const fileName = `${Date.now()}-${file.name}`;
+    const result = await Storage.put(fileName, file, {
+      contentType: file.type,
+      progressCallback,
+      level: 'public', // Or 'private' or 'protected' based on your needs
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload file');
-    }
-
-    // Return the public URL (without query parameters)
-    return presignedUrl.split('?')[0];
+    return result.key;
   } catch (error) {
+    console.error('Error uploading file:', error);
     throw new Error('File upload failed');
   }
 };
 
-export const deleteFile = async (fileUrl: string): Promise<void> => {
+/**
+ * Deletes a file from the S3 bucket.
+ * 
+ * @param fileKey The key of the file to delete.
+ */
+export const deleteFile = async (fileKey: string): Promise<void> => {
   try {
-    const key = fileUrl.split('/').pop();
-    if (!key) throw new Error('Invalid file URL');
-
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: `problem-images/${key}`,
-    };
-
-    await s3.deleteObject(params).promise();
+    await Storage.remove(fileKey, { level: 'public' });
   } catch (error) {
+    console.error('Error deleting file:', error);
     throw new Error('Failed to delete file');
+  }
+};
+
+/**
+ * Gets a publicly accessible URL for a file.
+ * 
+ * @param fileKey The key of the file.
+ * @returns The public URL of the file.
+ */
+export const getFileUrl = async (fileKey: string): Promise<string> => {
+  try {
+    const url = await Storage.get(fileKey, { level: 'public' });
+    // The URL might have query parameters for authentication, remove them for a clean public URL
+    return url.split('?')[0];
+  } catch (error) {
+    console.error('Error getting file URL:', error);
+    throw new Error('Failed to get file URL');
   }
 };

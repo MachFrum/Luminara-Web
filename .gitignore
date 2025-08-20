@@ -22,3 +22,7 @@ node_modules/
 *.sln
 *.sw?
 .env
+
+# Amplify
+amplify/
+src/aws-exports.js

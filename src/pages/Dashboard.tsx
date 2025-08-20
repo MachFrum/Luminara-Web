@@ -17,7 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { ProgressRing } from '../components/common/ProgressRing';
 import { GuestBanner } from '../components/common/GuestBanner';
-import { getProblemHistory, getAchievements } from '../lib/api';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { getDashboardData } from '../lib/api';
 import { ProblemEntry, Achievement } from '../types';
 
 const DashboardContainer = styled.div`
@@ -299,29 +300,35 @@ const QuoteAuthor = styled.cite`
   opacity: 0.9;
 `;
 
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+`;
+
 export const Dashboard: React.FC = () => {
   const { user, isGuest, exitGuestMode } = useAuth();
   const navigate = useNavigate();
   const [showGuestBanner, setShowGuestBanner] = useState(isGuest);
   const [recentProblems, setRecentProblems] = useState<ProblemEntry[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const loadData = async () => {
       try {
-        const [problems, achievementsData] = await Promise.all([
-          getProblemHistory(),
-          getAchievements(),
-        ]);
-        
-        setRecentProblems(problems.slice(0, 5));
-        setAchievements(achievementsData.slice(0, 4));
+        const data = await getDashboardData();
+        setRecentProblems(data.recentProblems || []);
+        setAchievements(data.achievements || []);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadDashboardData();
+    loadData();
   }, []);
 
   const handleGuestSignUp = () => {
@@ -366,6 +373,14 @@ export const Dashboard: React.FC = () => {
       action: () => navigate('/profile'),
     },
   ];
+
+  if (loading) {
+      return (
+          <LoadingContainer>
+              <LoadingSpinner size={40} />
+          </LoadingContainer>
+      );
+  }
 
   return (
     <DashboardContainer>

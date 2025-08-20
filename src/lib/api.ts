@@ -1,146 +1,160 @@
+import { API, graphqlOperation } from 'aws-amplify';
 import { ProblemEntry, ProblemSubmissionData, ProblemResult, Achievement, ActivityData } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.luminara.com';
+// Example GraphQL queries (these would be in src/graphql/queries.ts, etc.)
+// const listProblems = `query ListProblems { listProblems { items { id title ... } } }`;
+// const getProblem = `query GetProblem($id: ID!) { getProblem(id: $id) { id title ... } }`;
+// const createProblem = `mutation CreateProblem($input: CreateProblemInput!) { createProblem(input: $input) { id ... } }`;
+// const queryUserProgress = `query GetUserProgress { getUserProgress { stats { ... } achievements { ... } } }`;
 
-class ApiError extends Error {
-  status: number;
+// --- API Layer ---
 
-  constructor(message: string, status: number) {
-    super(message);
-    this.status = status;
-  }
-}
+// --- Problem-related API calls ---
 
-const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('accessToken');
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-};
-
-const handleResponse = async <T>(response: Response): Promise<T> => {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new ApiError(
-      errorData.message || 'An error occurred',
-      response.status
-    );
-  }
-  return response.json();
-};
-
-// Problem-related API calls
 export const submitProblem = async (data: ProblemSubmissionData): Promise<ProblemResult> => {
-  const response = await fetch(`${API_BASE_URL}/problems/submit`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  });
-  return handleResponse<ProblemResult>(response);
+  // Example for a GraphQL API
+  /*
+  try {
+    const result = await API.graphql(graphqlOperation(createProblem, { input: data }));
+    // @ts-ignore
+    return result.data.createProblem;
+  } catch (error) {
+    console.error('Error submitting problem via GraphQL', error);
+    throw new Error('Failed to submit problem');
+  }
+  */
+  throw new Error('submitProblem is not implemented');
 };
 
 export const getProblemHistory = async (): Promise<ProblemEntry[]> => {
-  // Mock data for demonstration
+  // Example for a GraphQL API
+  /*
+  try {
+    const problemData = await API.graphql(graphqlOperation(listProblems));
+    // @ts-ignore
+    return problemData.data.listProblems.items;
+  } catch (error) {
+    console.error('Error fetching problem history', error);
+    return [];
+  }
+  */
+  return []; // Return empty array by default
+};
+
+export const getProblemById = async (id: string): Promise<ProblemEntry> => {
+  // Example for a REST API
+  /*
+  try {
+    const result = await API.get('luminaraApi', `/problems/${id}`, {});
+    return result;
+  } catch (error) {
+    console.error(`Error fetching problem ${id}`, error);
+    throw new Error('Failed to fetch problem');
+  }
+  */
+  throw new Error('getProblemById is not implemented');
+};
+
+// --- User Progress and Achievement API calls ---
+
+export const getAchievements = async (): Promise<Achievement[]> => {
+  // This would also be an API call in a real application
+  /*
+  try {
+    const achievementData = await API.graphql(graphqlOperation(queries.listAchievements));
+    return achievementData.data.listAchievements.items;
+  } catch (error) {
+    console.error('Error fetching achievements', error);
+    return [];
+  }
+  */
+  return [];
+};
+
+export const getActivityData = async (period: 'week' | 'month'): Promise<ActivityData[]> => {
+  // This would also be an API call
+  /*
+  try {
+    const activityData = await API.get('luminaraApi', `/activity/${period}`, {});
+    return activityData;
+  } catch (error) {
+    console.error('Error fetching activity data', error);
+    return [];
+  }
+  */
+  return [];
+};
+
+export const getUserProgress = async (): Promise<any> => {
+  // This function should fetch all data needed for the Progress Page.
+  // Once your backend is ready, replace this mock data with a real API call.
+  /*
+  try {
+    const response = await API.graphql(graphqlOperation(queryUserProgress));
+    return response.data.getUserProgress;
+  } catch (error) {
+    console.error('Error fetching user progress', error);
+    throw error;
+  }
+  */
+
+  // Mock data to allow the ProgressPage to render during development
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([
-        {
-          id: '1',
-          userId: 'user1',
-          title: 'Quadratic Equation Solution',
-          description: 'Solve x² + 5x + 6 = 0',
-          subject: 'Mathematics',
-          difficulty: 'medium',
-          tags: ['algebra', 'equations'],
-          submittedAt: new Date(Date.now() - 86400000).toISOString(),
-          solvedAt: new Date(Date.now() - 86000000).toISOString(),
-          solution: 'x = -2 or x = -3',
-          status: 'solved',
-        },
-        {
-          id: '2',
-          userId: 'user1',
-          title: 'Chemical Balancing',
-          description: 'Balance the equation: H₂ + O₂ → H₂O',
-          subject: 'Chemistry',
-          difficulty: 'easy',
-          tags: ['balancing', 'reactions'],
-          submittedAt: new Date(Date.now() - 172800000).toISOString(),
-          solvedAt: new Date(Date.now() - 172000000).toISOString(),
-          solution: '2H₂ + O₂ → 2H₂O',
-          status: 'solved',
-        },
-      ]);
+      resolve({
+        stats: { challengesSolved: 38, topicsLearned: 23, goalsDone: 11 },
+        activities: Array(7).fill(0).map((_, i) => ({ date: `2025-01-${15+i}`, problems: Math.floor(Math.random() * 8) + 1, minutes: Math.floor(Math.random() * 60) + 15, completed: true })),
+        achievements: [
+            { id: '1', title: 'Problem Solver', description: 'Solved 50 problems', progress: 50, maxProgress: 50, unlockedAt: '2025-01-20' },
+            { id: '2', title: 'Streak Master', description: '7 days in a row', progress: 7, maxProgress: 7, unlockedAt: '2025-01-21' },
+            { id: '3', title: 'Quick Learner', description: 'Completed 5 topics', progress: 5, maxProgress: 5, unlockedAt: '2025-01-19' },
+            { id: '4', title: 'Dedicated Student', description: '42 hours learned', progress: 42, maxProgress: 50, unlockedAt: '2025-01-18' },
+        ],
+      });
     }, 500);
   });
 };
 
-export const getProblemById = async (id: string): Promise<ProblemEntry> => {
-  const response = await fetch(`${API_BASE_URL}/problems/${id}`, {
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<ProblemEntry>(response);
-};
-
-// Achievement-related API calls
-export const getAchievements = async (): Promise<Achievement[]> => {
-  // Mock data for demonstration
+export const getDashboardData = async (): Promise<any> => {
+  // This function should fetch all data needed for the Dashboard Page.
+  // Once your backend is ready, replace this mock data with a real API call.
+  
+  // Mock data to allow the Dashboard to render during development
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([
-        {
-          id: '1',
-          title: 'First Steps',
-          description: 'Solve your first problem',
-          icon: 'trophy',
-          unlockedAt: new Date(Date.now() - 86400000).toISOString(),
-          progress: 1,
-          maxProgress: 1,
-        },
-        {
-          id: '2',
-          title: 'Problem Solver',
-          description: 'Solve 10 problems',
-          icon: 'target',
-          progress: 8,
-          maxProgress: 10,
-        },
-        {
-          id: '3',
-          title: 'Streak Master',
-          description: 'Maintain a 7-day streak',
-          icon: 'flame',
-          unlockedAt: new Date(Date.now() - 3600000).toISOString(),
-          progress: 7,
-          maxProgress: 7,
-        },
-      ]);
+      resolve({
+        recentProblems: [
+          {
+            id: '1',
+            title: 'Quadratic Equation Solution',
+            subject: 'Mathematics',
+            difficulty: 'medium',
+            submittedAt: new Date(Date.now() - 86400000).toISOString(),
+          },
+          {
+            id: '2',
+            title: 'Chemical Balancing',
+            subject: 'Chemistry',
+            difficulty: 'easy',
+            submittedAt: new Date(Date.now() - 172800000).toISOString(),
+          },
+        ],
+        achievements: [
+          {
+            id: '1',
+            title: 'First Steps',
+            progress: 1,
+            maxProgress: 1,
+            unlockedAt: new Date(Date.now() - 86400000).toISOString(),
+          },
+          {
+            id: '2',
+            title: 'Problem Solver',
+            progress: 8,
+            maxProgress: 10,
+          },
+        ],
+      });
     }, 300);
-  });
-};
-
-// Activity data
-export const getActivityData = async (period: 'week' | 'month'): Promise<ActivityData[]> => {
-  // Mock data for demonstration
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const data = [];
-      const days = period === 'week' ? 7 : 30;
-      
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        
-        data.push({
-          date: date.toISOString().split('T')[0],
-          problemsSolved: Math.floor(Math.random() * 5) + 1,
-          hoursLearned: Math.floor(Math.random() * 3) + 0.5,
-          pointsEarned: Math.floor(Math.random() * 100) + 20,
-        });
-      }
-      
-      resolve(data);
-    }, 400);
   });
 };
