@@ -37,7 +37,7 @@ export const signUp = async (
   lastName: string,
   email: string,
   password: string
-): Promise<User> => {
+): Promise<any> => {
   try {
     const { user } = await Auth.signUp({
       username: email,
@@ -49,22 +49,7 @@ export const signUp = async (
         // You can add custom attributes here if they are defined in your User Pool
       },
     });
-    // For this example, we'll return a mock user object after sign-up.
-    // In a real app, you might need email verification before the user can sign in.
-    return {
-      id: user.userId,
-      email,
-      firstName,
-      lastName,
-      level: 1,
-      rank: 'Beginner',
-      totalPoints: 0,
-      streak: 0,
-      hoursLearned: 0,
-      problemsSolved: 0,
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-    };
+    return user;
   } catch (error) {
     console.error('Error signing up', error);
     throw error;

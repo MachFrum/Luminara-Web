@@ -62,7 +62,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (firstName: string, lastName: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      const user = await authService.signUp(firstName, lastName, email, password);
+      await authService.signUp(firstName, lastName, email, password);
+      // After sign-up, the user is often in an unconfirmed state.
+      // Depending on your Cognito setup, they might need to confirm their email
+      // before they can sign in. For this example, we'll assume they can sign in
+      // immediately after sign-up.
+      const user = await authService.signIn(email, password);
       setUser(user);
       setIsGuest(false);
     } finally {
