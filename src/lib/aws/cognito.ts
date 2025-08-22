@@ -1,95 +1,145 @@
-import { Auth } from 'aws-amplify';
-import { User } from '../../types';
+import {
+  signIn as amplifySignIn,
+  signUp as amplifySignUp,
+  signOut as amplifySignOut,
+  getCurrentUser as amplifyGetCurrentUser,
+  resetPassword,
+  confirmResetPassword,
+} from "aws-amplify/auth";
+import { User } from "../../types";
 
-// Helper function to map Cognito attributes to our User type
+// Helper: Map Cognito user → App User
 const mapCognitoUserToAppUser = (cognitoUser: any): User => {
-  const attributes = cognitoUser.attributes;
-  // NOTE: Once you set up your Cognito User Pool, make sure the custom attributes
-  // like level, rank, totalPoints, etc., are defined and mapped correctly.
+  const attributes = cognitoUser?.signInDetails?.loginId
+    ? cognitoUser.signInDetails
+    : {};
+
   return {
-    id: attributes.sub,
-    email: attributes.email,
-    firstName: attributes.given_name || 'John',
-    lastName: attributes.family_name || 'Doe',
-    level: parseInt(attributes['custom:level'] || '1', 10),
-    rank: attributes['custom:rank'] || 'Beginner',
-    totalPoints: parseInt(attributes['custom:totalPoints'] || '0', 10),
-    streak: parseInt(attributes['custom:streak'] || '0', 10),
-    hoursLearned: parseInt(attributes['custom:hoursLearned'] || '0', 10),
-    problemsSolved: parseInt(attributes['custom:problemsSolved'] || '0', 10),
-    createdAt: attributes.created_at || new Date().toISOString(),
-    lastLoginAt: attributes.last_login_at || new Date().toISOString(),
+    id: cognitoUser.userId || "",
+    email: attributes.loginId || "",
+    firstName: attributes.given_name || "John",
+    lastName: attributes.family_name || "Doe",
+    level: parseInt(attributes["custom:level"] || "1", 10),
+    rank: attributes["custom:rank"] || "Beginner",
+    totalPoints: parseInt(attributes["custom:totalPoints"] || "0", 10),
+    streak: parseInt(attributes["custom:streak"] || "0", 10),
+    hoursLearned: parseInt(attributes["custom:hoursLearned"] || "0", 10),
+    problemsSolved: parseInt(attributes["custom:problemsSolved"] || "0", 10),
+    createdAt: new Date().toISOString(),
+    lastLoginAt: new Date().toISOString(),
   };
 };
 
+// --- Auth functions --- //
+
+// Sign In
 export const signIn = async (email: string, password: string): Promise<User> => {
   try {
-    const cognitoUser = await Auth.signIn(email, password);
-    return mapCognitoUserToAppUser(cognitoUser);
+    const { isSignedIn, nextStep } = await amplifySignIn({ username: email, password });
+
+    if (!isSignedIn) {
+      console.log("Next step required:", nextStep);
+      throw new Error("User not fully signed in, more steps required.");
+    }
+
+    const user = await amplifyGetCurrentUser();
+    return mapCognitoUserToAppUser(user);
   } catch (error) {
-    console.error('Error signing in', error);
+    console.error("Error signing in", error);
     throw error;
   }
 };
 
+// Sign Up
 export const signUp = async (
   firstName: string,
   lastName: string,
   email: string,
   password: string
-): Promise<any> => {
+): Promise<User> => {
   try {
-    const { user } = await Auth.signUp({
+    const { userId, nextStep } = await amplifySignUp({
       username: email,
       password,
-      attributes: {
-        email,
-        given_name: firstName,
-        family_name: lastName,
-        // You can add custom attributes here if they are defined in your User Pool
+      options: {
+        userAttributes: {
+          email,
+          given_name: firstName,
+          family_name: lastName,
+        },
       },
     });
-    return user;
+
+    console.log("Sign up next step:", nextStep);
+
+    if (!userId) {
+      throw new Error("Sign up failed: userId missing.");
+    }
+
+    return {
+      id: userId,
+      email,
+      firstName,
+      lastName,
+      level: 1,
+      rank: "Beginner",
+      totalPoints: 0,
+      streak: 0,
+      hoursLearned: 0,
+      problemsSolved: 0,
+      createdAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+    };
   } catch (error) {
-    console.error('Error signing up', error);
+    console.error("Error signing up", error);
     throw error;
   }
 };
 
+// Sign Out
 export const signOut = async (): Promise<void> => {
   try {
-    await Auth.signOut();
+    await amplifySignOut();
   } catch (error) {
-    console.error('Error signing out', error);
+    console.error("Error signing out", error);
     throw error;
   }
 };
 
+// Get Current User
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
-    const cognitoUser = await Auth.currentAuthenticatedUser();
+    const cognitoUser = await amplifyGetCurrentUser();
     return mapCognitoUserToAppUser(cognitoUser);
-  } catch (error) {
-    // Not signed in
-    return null;
+  } catch {
+    return null; // not signed in
   }
 };
 
+// Forgot Password (request code)
 export const forgotPassword = async (email: string): Promise<void> => {
   try {
-    await Auth.forgotPassword(email);
+    await resetPassword({ username: email });
   } catch (error) {
-    console.error('Error sending password reset code', error);
+    console.error("Error sending reset code", error);
     throw error;
   }
 };
 
-// Example of how to handle password reset completion
-export const forgotPasswordSubmit = async (email: string, code: string, newPassword: string): Promise<void> => {
+// Forgot Password (submit new password)
+export const forgotPasswordSubmit = async (
+  email: string,
+  code: string,
+  newPassword: string
+): Promise<void> => {
   try {
-    await Auth.forgotPasswordSubmit(email, code, newPassword);
+    await confirmResetPassword({
+      username: email,
+      confirmationCode: code,
+      newPassword,
+    });
   } catch (error) {
-    console.error('Error resetting password', error);
+    console.error("Error resetting password", error);
     throw error;
   }
 };
