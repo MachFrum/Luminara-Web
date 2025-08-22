@@ -1,0 +1,32 @@
+{
+  "aws_project_region": "us-east-2",
+  "aws_cognito_identity_pool_id": "us-east-2:8367bcb0-a74b-41e8-a284-e3c8214eb6fa",
+  "aws_cognito_region": "us-east-2",
+  "aws_user_pools_id": "us-east-2_oJY57oOzV",
+  "aws_user_pools_web_client_id": "vms16ruec14d9cqvqaha6d7uj",
+  "oauth": {},
+  "aws_cognito_username_attributes": [
+    "EMAIL"
+  ],
+  "aws_cognito_social_providers": [],
+  "aws_cognito_signup_attributes": [
+    "EMAIL"
+  ],
+  "aws_cognito_mfa_configuration": "OFF",
+  "aws_cognito_mfa_types": [
+    "SMS"
+  ],
+  "aws_cognito_password_protection_settings": {
+    "passwordPolicyMinLength": 8,
+    "passwordPolicyCharacters": []
+  },
+  "aws_cognito_verification_mechanisms": [
+    "EMAIL"
+  ],
+  "aws_appsync_graphqlEndpoint": "https://ewevjcvq6vdhbkvhfz56ng5txe.appsync-api.us-east-2.amazonaws.com/graphql",
+  "aws_appsync_region": "us-east-2",
+  "aws_appsync_authenticationType": "API_KEY",
+  "aws_appsync_apiKey": "da2-oaw2iwqtfvah7ivxwcqgnnsdp4",
+  "aws_user_files_s3_bucket": "luminaralearnbucket492fc-luminara",
+  "aws_user_files_s3_bucket_region": "us-east-2"
+}
