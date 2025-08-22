@@ -5,6 +5,8 @@ import {
   getCurrentUser as amplifyGetCurrentUser,
   resetPassword,
   confirmResetPassword,
+  confirmSignUp as amplifyConfirmSignUp,
+  resendSignUpCode as amplifyResendSignUpCode,
 } from "aws-amplify/auth";
 import { User } from "../../types";
 
@@ -140,6 +142,26 @@ export const forgotPasswordSubmit = async (
     });
   } catch (error) {
     console.error("Error resetting password", error);
+    throw error;
+  }
+};
+
+// Confirm Sign Up
+export const confirmSignUp = async (email: string, code: string): Promise<void> => {
+  try {
+    await amplifyConfirmSignUp({ username: email, confirmationCode: code });
+  } catch (error) {
+    console.error("Error confirming sign up", error);
+    throw error;
+  }
+};
+
+// Resend Sign Up Code
+export const resendSignUpCode = async (email: string): Promise<void> => {
+  try {
+    await amplifyResendSignUpCode({ username: email });
+  } catch (error) {
+    console.error("Error resending sign up code", error);
     throw error;
   }
 };

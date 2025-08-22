@@ -8,6 +8,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Learn } from './pages/Learn';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
+import { ConfirmSignUpPage } from './pages/auth/ConfirmSignUpPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { ProgressPage } from './pages/ProgressPage';
@@ -81,6 +82,7 @@ const AppContent: React.FC = () => {
               <Routes>
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route path="confirm-signup" element={<ConfirmSignUpPage />} />
                 <Route path="forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="*" element={<Navigate to="/auth/login" replace />} />
               </Routes>

@@ -215,7 +215,7 @@ export const RegisterPage: React.FC = () => {
         if (isValid) {
             try {
                 await register(formData.firstName, formData.lastName, formData.email, formData.password);
-                navigate('/');
+                navigate('/auth/confirm-signup', { state: { email: formData.email } });
             } catch (error) {
                 setErrors({ general: error instanceof Error ? error.message : 'Registration failed' });
             }

@@ -9,6 +9,8 @@ interface AuthContextValue {
   isGuest: boolean;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
+  confirmSignUp: (email: string, code: string) => Promise<void>;
+  resendSignUpCode: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   enterGuestMode: () => void;
@@ -63,16 +65,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await authService.signUp(firstName, lastName, email, password);
-      // After sign-up, the user is often in an unconfirmed state.
-      // Depending on your Cognito setup, they might need to confirm their email
-      // before they can sign in. For this example, we'll assume they can sign in
-      // immediately after sign-up.
-      const user = await authService.signIn(email, password);
-      setUser(user);
-      setIsGuest(false);
+      // After sign-up, the user is in an unconfirmed state.
+      // They need to confirm their email before they can sign in.
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const confirmSignUp = async (email: string, code: string) => {
+    await authService.confirmSignUp(email, code);
+  };
+
+  const resendSignUpCode = async (email: string) => {
+    await authService.resendSignUpCode(email);
   };
 
   const logout = async () => {
@@ -131,6 +136,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isGuest,
     login,
     register,
+    confirmSignUp,
+    resendSignUpCode,
     logout,
     resetPassword,
     enterGuestMode,
