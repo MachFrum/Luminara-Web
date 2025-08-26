@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { ActivityChart } from '../components/common/ActivityChart';
 import { ProgressRing } from '../components/common/ProgressRing';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { Target, Trophy, Flame, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
+import { Target, Flame, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
 
 // Mock Data (replace with actual data from your API)
 const progressData = {
@@ -68,7 +67,7 @@ export const ProgressPage: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard icon={<Trophy />} label="Challenges" value={progressData.stats.challengesSolved} color="#3B82F6" />
+          <StatCard icon={<Award />} label="Challenges" value={progressData.stats.challengesSolved} color="#3B82F6" />
           <StatCard icon={<Target />} label="Topics" value={progressData.stats.topicsLearned} color="#10B981" />
           <StatCard icon={<Flame />} label="Goals" value={progressData.stats.goalsDone} color="#EF4444" />
         </div>
