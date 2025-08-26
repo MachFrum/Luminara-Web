@@ -2,11 +2,11 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GuestBanner } from '../components/common/GuestBanner';
-import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Brain } from 'react-feather';
+import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Cpu } from 'react-feather';
 
 // Mock Data (replace with actual data from your API)
 const quickActions = [
-  { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Brain, color: 'text-light-accent', route: '/learn' },
+  { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
   { id: '2', title: 'View Progress', description: 'Track your learning journey.', icon: TrendingUp, color: 'text-light-accent', route: '/progress' },
   { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
   { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
