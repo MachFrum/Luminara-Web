@@ -37,7 +37,7 @@ export const LoginPage: React.FC = () => {
     }
 
     try {
-      await login({ email, password, rememberMe });
+      await login(email, password, rememberMe);
       navigate('/');
     } catch (err) {
       // Error is handled by the auth context and displayed
