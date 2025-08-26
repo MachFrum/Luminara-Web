@@ -14,25 +14,25 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
-  const validateField = (field: string, value: string) => {
-    const newErrors = { ...fieldErrors };
-    if (!value) {
-      newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
-    } else if (field === 'email' && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
-      newErrors.email = 'Please enter a valid email';
-    } else {
-      delete newErrors[field];
-    }
-    setFieldErrors(newErrors);
-  };
+  
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    validateField('email', email);
-    validateField('password', password);
+    const newFieldErrors: { [key: string]: string } = {};
+    if (!email) {
+      newFieldErrors.email = 'Email is required';
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      newFieldErrors.email = 'Please enter a valid email';
+    }
 
-    if (Object.keys(fieldErrors).length > 0 || !email || !password) {
+    if (!password) {
+      newFieldErrors.password = 'Password is required';
+    }
+
+    setFieldErrors(newFieldErrors);
+
+    if (Object.keys(newFieldErrors).length > 0) {
       return;
     }
 
@@ -78,10 +78,7 @@ export const LoginPage: React.FC = () => {
                   type="email"
                   placeholder="Email address"
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    validateField('email', e.target.value);
-                  }}
+                  onChange={(e) => setEmail(e.target.value)}
                   className={`w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`}
                 />
               </div>
@@ -95,10 +92,7 @@ export const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    validateField('password', e.target.value);
-                  }}
+                  onChange={(e) => setPassword(e.target.value)}
                   className={`w-full pl-10 pr-10 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
