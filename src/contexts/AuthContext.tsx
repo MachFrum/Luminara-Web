@@ -16,6 +16,8 @@ interface AuthContextValue {
   enterGuestMode: () => void;
   exitGuestMode: () => void;
   updateProfile: (updates: Partial<User>) => Promise<void>;
+  error: string | null;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -28,6 +30,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isAuthenticated = !!user && !isGuest;
 
@@ -48,6 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string, rememberMe = false) => {
     setIsLoading(true);
+    setError(null); // Clear any previous errors
     try {
       const user = await authService.signIn(email, password);
       setUser(user);
@@ -56,6 +60,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (rememberMe) {
         localStorage.setItem('rememberUser', 'true');
       }
+    } catch (err: any) {
+      setError(err.message || 'An unknown error occurred during login.');
+      throw err; // Re-throw to allow LoginPage to handle if needed
     } finally {
       setIsLoading(false);
     }
@@ -119,6 +126,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  const clearError = () => {
+    setError(null);
+  };
+
   const updateProfile = async (updates: Partial<User>) => {
     if (!user) throw new Error('No user to update');
     
@@ -143,6 +154,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     enterGuestMode,
     exitGuestMode,
     updateProfile,
+    error,
+    clearError,
   };
 
   return (
