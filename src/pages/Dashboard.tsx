@@ -1,27 +1,17 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GuestBanner } from '../components/common/GuestBanner';
 import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Cpu } from 'react-feather';
+import { getDashboardData } from '../lib/api';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
-// Mock Data (replace with actual data from your API)
 const quickActions = [
   { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
   { id: '2', title: 'View Progress', description: 'Track your learning journey.', icon: TrendingUp, color: 'text-light-accent', route: '/progress' },
   { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
   { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
-];
-
-const recentActivities = [
-  { id: '1', title: 'Quadratic Equations', subject: 'Mathematics', timeAgo: '2 hours ago', difficulty: 'medium', imageUrl: 'https://images.pexels.com/photos/6238297/pexels-photo-6238297.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
-  { id: '2', title: 'Photosynthesis Process', subject: 'Biology', timeAgo: '1 day ago', difficulty: 'easy', imageUrl: 'https://images.pexels.com/photos/1072179/pexels-photo-1072179.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
-  { id: '3', title: 'Newton\'s Laws', subject: 'Physics', timeAgo: '2 days ago', difficulty: 'hard', imageUrl: 'https://images.pexels.com/photos/355952/pexels-photo-355952.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
-];
-
-const achievements = [
-  { id: '1', title: 'Problem Solver', description: 'Solve 50 problems', icon: Target, color: 'text-light-accent', progress: 35, maxProgress: 50 },
-  { id: '2', title: 'Streak Master', description: '7 day learning streak', icon: Zap, color: 'text-light-accent', progress: 7, maxProgress: 7 },
-  { id: '3', title: 'Quick Learner', description: 'Complete 5 topics', icon: Zap, color: 'text-light-accent', progress: 3, maxProgress: 5 },
 ];
 
 const getDifficultyClass = (difficulty: string) => {
@@ -43,11 +33,36 @@ const getGreeting = () => {
 export const Dashboard: React.FC = () => {
   const { user, isGuest, exitGuestMode } = useAuth();
   const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const data = await getDashboardData();
+        setDashboardData(data);
+      } catch (err) {
+        setError('Failed to load dashboard data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDashboardData();
+  }, []);
 
   const handleGuestSignUp = () => {
     exitGuestMode();
     navigate('/auth/register');
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><LoadingSpinner size={40} /></div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
@@ -64,21 +79,21 @@ export const Dashboard: React.FC = () => {
         <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
           <BookOpen className="w-8 h-8 text-light-accent" />
           <div>
-            <p className="text-2xl font-bold text-light-text dark:text-dark-text">127</p>
+            <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.problemsSolved || 0}</p>
             <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
           </div>
         </div>
         <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
           <Clock className="w-8 h-8 text-light-accent" />
           <div>
-            <p className="text-2xl font-bold text-light-text dark:text-dark-text">42</p>
+            <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.hoursLearned || 0}</p>
             <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
           </div>
         </div>
         <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
           <Zap className="w-8 h-8 text-red-500" />
           <div>
-            <p className="text-2xl font-bold text-light-text dark:text-dark-text">7</p>
+            <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.streak || 0}</p>
             <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
           </div>
         </div>
@@ -106,14 +121,13 @@ export const Dashboard: React.FC = () => {
           <section>
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Activity</h2>
             <div className="space-y-4">
-              {recentActivities.map(activity => (
+              {dashboardData?.recentProblems?.map((activity: any) => (
                 <div key={activity.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
-                  <img src={activity.imageUrl} alt={activity.title} className="w-16 h-16 rounded-lg object-cover" />
                   <div className="flex-1">
                     <h3 className="font-bold text-light-text dark:text-dark-text">{activity.title}</h3>
                     <p className="text-sm text-light-accent">{activity.subject}</p>
                     <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{activity.timeAgo}</p>
+                      <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{new Date(activity.submittedAt).toLocaleDateString()}</p>
                       <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${getDifficultyClass(activity.difficulty)}`}>{activity.difficulty}</span>
                     </div>
                   </div>
@@ -130,10 +144,10 @@ export const Dashboard: React.FC = () => {
           <section>
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Achievements</h2>
             <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md space-y-6">
-              {achievements.map(achievement => (
+              {dashboardData?.achievements?.map((achievement: any) => (
                 <div key={achievement.id}>
                   <div className="flex items-center gap-4">
-                    <achievement.icon className={`w-8 h-8 ${achievement.color}`} />
+                    <Award className="w-8 h-8 text-light-accent" />
                     <div>
                       <h3 className="font-bold text-light-text dark:text-dark-text">{achievement.title}</h3>
                       <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>

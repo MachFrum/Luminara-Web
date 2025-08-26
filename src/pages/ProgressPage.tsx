@@ -1,55 +1,41 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { ActivityChart } from '../components/common/ActivityChart';
 import { ProgressRing } from '../components/common/ProgressRing';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Target, Flame, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
-
-// Mock Data (replace with actual data from your API)
-const progressData = {
-  stats: {
-    challengesSolved: 38,
-    topicsLearned: 23,
-    goalsDone: 11,
-    totalPoints: 462,
-    level: 12,
-    rank: 'Learning Explorer',
-  },
-  activities: [
-    { date: '2025-01-15', problems: 5, minutes: 45, completed: true },
-    { date: '2025-01-16', problems: 3, minutes: 30, completed: true },
-    { date: '2025-01-17', problems: 7, minutes: 60, completed: true },
-    { date: '2025-01-18', problems: 4, minutes: 35, completed: true },
-    { date: '2025-01-19', problems: 6, minutes: 50, completed: true },
-    { date: '2025-01-20', problems: 2, minutes: 20, completed: true },
-    { date: '2025-01-21', problems: 8, minutes: 70, completed: true },
-  ],
-  subjects: [
-    { id: '1', name: 'Quadratic Equations', progress: 85, color: '#3B82F6', problems: 47, totalProblems: 60, lastActivity: '2 hours ago' },
-    { id: '2', name: 'Photosynthesis', progress: 70, color: '#10B981', problems: 32, totalProblems: 45, lastActivity: '1 day ago' },
-    { id: '3', name: 'AWS Lambda', progress: 60, color: '#F59E0B', problems: 28, totalProblems: 50, lastActivity: '3 hours ago' },
-  ],
-  achievements: [
-    { id: '1', title: 'Problem Solver', description: 'Solved 50 problems', color: '#F59E0B', unlockedAt: '2025-01-20', rarity: 'epic', progress: 50, maxProgress: 50 },
-    { id: '2', title: 'Streak Master', description: '7 days in a row', color: '#EF4444', unlockedAt: '2025-01-21', rarity: 'common', progress: 7, maxProgress: 7 },
-    { id: '3', title: 'Quick Learner', description: 'Completed 5 topics', color: '#8B5CF6', unlockedAt: '2025-01-19', rarity: 'common', progress: 5, maxProgress: 5 },
-    { id: '4', title: 'Dedicated Student', description: '42 hours learned', color: '#10B981', unlockedAt: '2025-01-18', rarity: 'rare', progress: 42, maxProgress: 50 },
-  ],
-  goals: [
-    { id: '1', title: 'Weekly Challenge', description: 'Solve 50 problems this week', progress: 35, target: 50, color: '#3B82F6' },
-    { id: '2', title: 'Study Marathon', description: 'Study for 10 hours this week', progress: 7.5, target: 10, color: '#10B981' },
-  ],
-};
+import { getUserProgress } from '../lib/api';
 
 export const ProgressPage: React.FC = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false); // Set to true when fetching real data
+  const [progressData, setProgressData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAchievementsModal, setShowAchievementsModal] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('week');
 
+  useEffect(() => {
+    const loadProgressData = async () => {
+      try {
+        const data = await getUserProgress();
+        setProgressData(data);
+      } catch (err) {
+        setError('Failed to load progress data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProgressData();
+  }, []);
+
   if (loading) {
     return <div className="flex justify-center items-center h-screen"><LoadingSpinner size={40} /></div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
   }
 
   return (
@@ -91,7 +77,7 @@ export const ProgressPage: React.FC = () => {
           <SectionCard>
             <SectionHeader title="Topic Progress" />
             <div className="space-y-4">
-              {progressData.subjects.map(subject => <SubjectCard key={subject.id} subject={subject} />)}
+              {progressData.subjects.map((subject:any) => <SubjectCard key={subject.id} subject={subject} />)}
             </div>
           </SectionCard>
 
@@ -99,7 +85,7 @@ export const ProgressPage: React.FC = () => {
           <SectionCard>
             <SectionHeader title="Current Goals" />
             <div className="space-y-4">
-              {progressData.goals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
+              {progressData.goals.map((goal:any) => <GoalCard key={goal.id} goal={goal} />)}
             </div>
           </SectionCard>
         </div>
@@ -109,7 +95,7 @@ export const ProgressPage: React.FC = () => {
           <SectionCard>
             <SectionHeader title="Recent Achievements" onSeeAll={() => setShowAchievementsModal(true)} />
             <div className="space-y-4">
-              {progressData.achievements.slice(0, 3).map(ach => <AchievementPill key={ach.id} achievement={ach} />)}
+              {progressData.achievements.slice(0, 3).map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />)}
             </div>
           </SectionCard>
 
@@ -198,7 +184,7 @@ const AchievementsModal: React.FC<{ achievements: any[]; onClose: () => void }> 
         <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border"><X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" /></button>
       </header>
       <div className="p-6 overflow-y-auto space-y-4">
-        {achievements.map(ach => <AchievementPill key={ach.id} achievement={ach} />)}
+        {achievements.map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />)}
       </div>
     </div>
   </div>
