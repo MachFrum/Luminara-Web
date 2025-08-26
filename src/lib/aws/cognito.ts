@@ -37,7 +37,9 @@ const mapCognitoUserToAppUser = (cognitoUser: any): User => {
 // Sign In
 export const signIn = async (email: string, password: string): Promise<User> => {
   try {
-    console.log("Attempting signIn with email:", email, "and password length:", password.length);
+    if (typeof password !== 'string' || password === null || password === undefined) {
+      throw new Error("Password must be a valid string for signIn.");
+    }
     const { isSignedIn, nextStep } = await amplifySignIn({ username: email, password });
 
     if (!isSignedIn) {
