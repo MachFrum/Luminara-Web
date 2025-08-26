@@ -5,7 +5,7 @@ import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { ActivityChart } from '../components/common/ActivityChart';
 import { ProgressRing } from '../components/common/ProgressRing';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { Target, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
+import { Target, Heart, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
 import { getUserProgress } from '../lib/api';
 
 export const ProgressPage: React.FC = () => {
@@ -55,7 +55,7 @@ export const ProgressPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard icon={<Award />} label="Challenges" value={progressData.stats.challengesSolved} color="#3B82F6" />
           <StatCard icon={<Target />} label="Topics" value={progressData.stats.topicsLearned} color="#10B981" />
-          <StatCard icon={<Zap />} label="Goals" value={progressData.stats.goalsDone} color="#EF4444" />
+          <StatCard icon={<Heart />} label="Goals" value={progressData.stats.goalsDone} color="#EF4444" />
         </div>
       </header>
 
