@@ -1,542 +1,167 @@
-import React, { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
-import { 
-  BookOpen, 
-  BarChart3, 
-  Trophy, 
-  Target,
-  TrendingUp,
-  Clock,
-  Calendar,
-  Award,
-  Flame,
-  Brain
-} from 'lucide-react';
+import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { AnimatedCounter } from '../components/common/AnimatedCounter';
-import { ProgressRing } from '../components/common/ProgressRing';
 import { GuestBanner } from '../components/common/GuestBanner';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { getDashboardData } from '../lib/api';
-import { ProblemEntry, Achievement } from '../types';
+import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Brain } from 'react-feather';
 
-const DashboardContainer = styled.div`
-  padding: ${props => props.theme.spacing.lg};
-  max-width: 1200px;
-  margin: 0 auto;
-`;
+// Mock Data (replace with actual data from your API)
+const quickActions = [
+  { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Brain, color: 'text-light-accent', route: '/learn' },
+  { id: '2', title: 'View Progress', description: 'Track your learning journey.', icon: TrendingUp, color: 'text-light-accent', route: '/progress' },
+  { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
+  { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
+];
 
-const WelcomeSection = styled.div`
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
+const recentActivities = [
+  { id: '1', title: 'Quadratic Equations', subject: 'Mathematics', timeAgo: '2 hours ago', difficulty: 'medium', imageUrl: 'https://images.pexels.com/photos/6238297/pexels-photo-6238297.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
+  { id: '2', title: 'Photosynthesis Process', subject: 'Biology', timeAgo: '1 day ago', difficulty: 'easy', imageUrl: 'https://images.pexels.com/photos/1072179/pexels-photo-1072179.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
+  { id: '3', title: 'Newton\'s Laws', subject: 'Physics', timeAgo: '2 days ago', difficulty: 'hard', imageUrl: 'https://images.pexels.com/photos/355952/pexels-photo-355952.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
+];
 
-const WelcomeText = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-  
-  @media (max-width: 768px) {
-    font-size: 2rem;
+const achievements = [
+  { id: '1', title: 'Problem Solver', description: 'Solve 50 problems', icon: Target, color: 'text-light-accent', progress: 35, maxProgress: 50 },
+  { id: '2', title: 'Streak Master', description: '7 day learning streak', icon: Zap, color: 'text-light-accent', progress: 7, maxProgress: 7 },
+  { id: '3', title: 'Quick Learner', description: 'Complete 5 topics', icon: Zap, color: 'text-light-accent', progress: 3, maxProgress: 5 },
+];
+
+const getDifficultyClass = (difficulty: string) => {
+  switch (difficulty) {
+    case 'easy': return 'bg-green-500';
+    case 'medium': return 'bg-yellow-500';
+    case 'hard': return 'bg-red-500';
+    default: return 'bg-gray-500';
   }
-`;
+};
 
-const WelcomeSubtext = styled.p`
-  font-size: 1.125rem;
-  color: ${props => props.theme.colors.textSecondary};
-  margin: 0;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const StatCard = styled.div`
-  background: ${props => props.theme.colors.surface};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  padding: ${props => props.theme.spacing.lg};
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${props => props.theme.shadows.medium};
-  }
-`;
-
-const StatIcon = styled.div<{ color: string }>`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: ${props => props.color}20;
-  color: ${props => props.color};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-`;
-
-const QuickActionsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const ActionCard = styled.button`
-  background: ${props => props.theme.colors.surface};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  padding: ${props => props.theme.spacing.lg};
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${props => props.theme.shadows.medium};
-    border-color: ${props => props.theme.colors.primary};
-  }
-`;
-
-const ActionIcon = styled.div<{ color: string }>`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: ${props => props.color}20;
-  color: ${props => props.color};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${props => props.theme.spacing.sm} auto;
-`;
-
-const ActionTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.xs} 0;
-`;
-
-const ActionDescription = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  margin: 0;
-  font-size: 0.875rem;
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: ${props => props.theme.spacing.lg};
-  
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const RecentActivitySection = styled.div`
-  background: ${props => props.theme.colors.surface};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  padding: ${props => props.theme.spacing.lg};
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.md} 0;
-`;
-
-const ActivityList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.sm};
-`;
-
-const ActivityItem = styled.div`
-  padding: ${props => props.theme.spacing.sm};
-  border-radius: ${props => props.theme.borderRadius};
-  border: 1px solid ${props => props.theme.colors.border};
-  background: ${props => props.theme.colors.backgroundSecondary};
-`;
-
-const ActivityTitle = styled.div`
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const ActivityMeta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.sm};
-  font-size: 0.875rem;
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const SidebarSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.md};
-`;
-
-const ProgressSection = styled.div`
-  background: ${props => props.theme.colors.surface};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  padding: ${props => props.theme.spacing.lg};
-`;
-
-const ProgressContent = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-`;
-
-const ProgressText = styled.div`
-  flex: 1;
-`;
-
-const ProgressLevel = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.text};
-`;
-
-const ProgressRank = styled.div`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-`;
-
-const AchievementsSection = styled.div`
-  background: ${props => props.theme.colors.surface};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  padding: ${props => props.theme.spacing.lg};
-`;
-
-const AchievementsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.sm};
-`;
-
-const AchievementItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.sm};
-  padding: ${props => props.theme.spacing.sm};
-  border-radius: ${props => props.theme.borderRadius};
-  background: ${props => props.theme.colors.backgroundSecondary};
-`;
-
-const AchievementIcon = styled.div<{ unlocked: boolean }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${props => props.unlocked ? props.theme.colors.warning : props.theme.colors.border};
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: ${props => props.unlocked ? 1 : 0.5};
-`;
-
-const AchievementContent = styled.div`
-  flex: 1;
-`;
-
-const AchievementTitle = styled.div`
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const AchievementProgress = styled.div`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: 0.75rem;
-`;
-
-const MotivationalQuote = styled.div`
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary}, ${props => props.theme.colors.secondary});
-  color: white;
-  padding: ${props => props.theme.spacing.lg};
-  border-radius: ${props => props.theme.borderRadius};
-  text-align: center;
-`;
-
-const QuoteText = styled.blockquote`
-  font-size: 1.125rem;
-  font-style: italic;
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-  line-height: 1.5;
-`;
-
-const QuoteAuthor = styled.cite`
-  font-size: 0.875rem;
-  opacity: 0.9;
-`;
-
-const LoadingContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
-`;
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+};
 
 export const Dashboard: React.FC = () => {
   const { user, isGuest, exitGuestMode } = useAuth();
   const navigate = useNavigate();
-  const [showGuestBanner, setShowGuestBanner] = useState(isGuest);
-  const [recentProblems, setRecentProblems] = useState<ProblemEntry[]>([]);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await getDashboardData();
-        setRecentProblems(data.recentProblems || []);
-        setAchievements(data.achievements || []);
-      } catch (error) {
-        console.error('Failed to load dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
 
   const handleGuestSignUp = () => {
     exitGuestMode();
     navigate('/auth/register');
   };
 
-  const getCurrentTimeGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  };
-
-  const quickActions = [
-    {
-      title: 'Start Learning',
-      description: 'Submit a new problem',
-      icon: BookOpen,
-      color: '#3B82F6',
-      action: () => navigate('/learn'),
-    },
-    {
-      title: 'View Progress',
-      description: 'Check your analytics',
-      icon: BarChart3,
-      color: '#14B8A6',
-      action: () => navigate('/progress'),
-    },
-    {
-      title: 'Achievements',
-      description: 'See your badges',
-      icon: Trophy,
-      color: '#F97316',
-      action: () => navigate('/progress#achievements'),
-    },
-    {
-      title: 'Profile Settings',
-      description: 'Update your account',
-      icon: Target,
-      color: '#8B5CF6',
-      action: () => navigate('/profile'),
-    },
-  ];
-
-  if (loading) {
-      return (
-          <LoadingContainer>
-              <LoadingSpinner size={40} />
-          </LoadingContainer>
-      );
-  }
-
   return (
-    <DashboardContainer>
-      {showGuestBanner && (
-        <GuestBanner
-          onSignUpClick={handleGuestSignUp}
-          onClose={() => setShowGuestBanner(false)}
-        />
-      )}
-      
-      <WelcomeSection>
-        <WelcomeText>
-          {getCurrentTimeGreeting()}, {user?.firstName || 'Guest'}! 👋
-        </WelcomeText>
-        <WelcomeSubtext>
-          Ready to tackle some challenging problems today?
-        </WelcomeSubtext>
-      </WelcomeSection>
+    <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
+      {isGuest && <GuestBanner onSignUpClick={handleGuestSignUp} onClose={() => {}} />}
 
-      <StatsGrid>
-        <StatCard>
-          <StatIcon color="#3B82F6">
-            <Brain size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>
-              <AnimatedCounter targetValue={user?.problemsSolved || 0} />
-            </StatValue>
-            <StatLabel>Problems Solved</StatLabel>
-          </StatContent>
-        </StatCard>
+      {/* Header */}
+      <header className="mb-8">
+        <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text mt-1">Ready to learn something new?</h1>
+      </header>
 
-        <StatCard>
-          <StatIcon color="#14B8A6">
-            <Clock size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>
-              <AnimatedCounter targetValue={user?.hoursLearned || 0} suffix="h" />
-            </StatValue>
-            <StatLabel>Hours Learned</StatLabel>
-          </StatContent>
-        </StatCard>
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+          <BookOpen className="w-8 h-8 text-light-accent" />
+          <div>
+            <p className="text-2xl font-bold text-light-text dark:text-dark-text">127</p>
+            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
+          </div>
+        </div>
+        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+          <Clock className="w-8 h-8 text-light-accent" />
+          <div>
+            <p className="text-2xl font-bold text-light-text dark:text-dark-text">42</p>
+            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
+          </div>
+        </div>
+        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+          <Zap className="w-8 h-8 text-red-500" />
+          <div>
+            <p className="text-2xl font-bold text-light-text dark:text-dark-text">7</p>
+            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
+          </div>
+        </div>
+      </div>
 
-        <StatCard>
-          <StatIcon color="#F97316">
-            <Flame size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>
-              <AnimatedCounter targetValue={user?.streak || 0} />
-            </StatValue>
-            <StatLabel>Day Streak</StatLabel>
-          </StatContent>
-        </StatCard>
-
-        <StatCard>
-          <StatIcon color="#8B5CF6">
-            <TrendingUp size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>
-              <AnimatedCounter targetValue={user?.totalPoints || 0} />
-            </StatValue>
-            <StatLabel>Total Points</StatLabel>
-          </StatContent>
-        </StatCard>
-      </StatsGrid>
-
-      <QuickActionsGrid>
-        {quickActions.map((action, index) => (
-          <ActionCard key={index} onClick={action.action}>
-            <ActionIcon color={action.color}>
-              <action.icon size={20} />
-            </ActionIcon>
-            <ActionTitle>{action.title}</ActionTitle>
-            <ActionDescription>{action.description}</ActionDescription>
-          </ActionCard>
-        ))}
-      </QuickActionsGrid>
-
-      <ContentGrid>
-        <RecentActivitySection>
-          <SectionTitle>Recent Activity</SectionTitle>
-          <ActivityList>
-            {recentProblems.length > 0 ? (
-              recentProblems.map((problem) => (
-                <ActivityItem key={problem.id}>
-                  <ActivityTitle>{problem.title}</ActivityTitle>
-                  <ActivityMeta>
-                    <Calendar size={14} />
-                    {new Date(problem.submittedAt).toLocaleDateString()}
-                    <span>•</span>
-                    <span>{problem.subject}</span>
-                    <span>•</span>
-                    <span className={`difficulty-${problem.difficulty}`}>
-                      {problem.difficulty}
-                    </span>
-                  </ActivityMeta>
-                </ActivityItem>
-              ))
-            ) : (
-              <ActivityItem>
-                <ActivityTitle>No recent activity</ActivityTitle>
-                <ActivityMeta>
-                  Start solving problems to see your activity here
-                </ActivityMeta>
-              </ActivityItem>
-            )}
-          </ActivityList>
-        </RecentActivitySection>
-
-        <SidebarSection>
-          <ProgressSection>
-            <SectionTitle>Your Progress</SectionTitle>
-            <ProgressContent>
-              <ProgressRing
-                progress={(user?.level || 1) * 20}
-                size={80}
-                showPercentage={false}
-                label="Level"
-              />
-              <ProgressText>
-                <ProgressLevel>Level {user?.level || 1}</ProgressLevel>
-                <ProgressRank>{user?.rank || 'Beginner'}</ProgressRank>
-              </ProgressText>
-            </ProgressContent>
-          </ProgressSection>
-
-          <AchievementsSection>
-            <SectionTitle>Achievements</SectionTitle>
-            <AchievementsList>
-              {achievements.map((achievement) => (
-                <AchievementItem key={achievement.id}>
-                  <AchievementIcon unlocked={!!achievement.unlockedAt}>
-                    <Award size={20} />
-                  </AchievementIcon>
-                  <AchievementContent>
-                    <AchievementTitle>{achievement.title}</AchievementTitle>
-                    <AchievementProgress>
-                      {achievement.progress}/{achievement.maxProgress}
-                    </AchievementProgress>
-                  </AchievementContent>
-                </AchievementItem>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Quick Actions */}
+          <section>
+            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {quickActions.map(action => (
+                <button key={action.id} onClick={() => navigate(action.route)} className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md text-left hover:scale-105 transition-transform">
+                  <action.icon className={`w-8 h-8 ${action.color} mb-3`} />
+                  <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{action.title}</h3>
+                  <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{action.description}</p>
+                </button>
               ))}
-            </AchievementsList>
-          </AchievementsSection>
+            </div>
+          </section>
 
-          <MotivationalQuote>
-            <QuoteText>
-              "The expert in anything was once a beginner."
-            </QuoteText>
-            <QuoteAuthor>— Helen Hayes</QuoteAuthor>
-          </MotivationalQuote>
-        </SidebarSection>
-      </ContentGrid>
-    </DashboardContainer>
+          {/* Recent Activity */}
+          <section>
+            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Activity</h2>
+            <div className="space-y-4">
+              {recentActivities.map(activity => (
+                <div key={activity.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+                  <img src={activity.imageUrl} alt={activity.title} className="w-16 h-16 rounded-lg object-cover" />
+                  <div className="flex-1">
+                    <h3 className="font-bold text-light-text dark:text-dark-text">{activity.title}</h3>
+                    <p className="text-sm text-light-accent">{activity.subject}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{activity.timeAgo}</p>
+                      <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${getDifficultyClass(activity.difficulty)}`}>{activity.difficulty}</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-8">
+          {/* Achievements Progress */}
+          <section>
+            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Achievements</h2>
+            <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md space-y-6">
+              {achievements.map(achievement => (
+                <div key={achievement.id}>
+                  <div className="flex items-center gap-4">
+                    <achievement.icon className={`w-8 h-8 ${achievement.color}`} />
+                    <div>
+                      <h3 className="font-bold text-light-text dark:text-dark-text">{achievement.title}</h3>
+                      <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2.5">
+                      <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
+                    </div>
+                    <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Motivational Quote */}
+          <section>
+            <div className="bg-gradient-to-br from-light-deepNavy to-light-accent p-6 rounded-2xl shadow-lg text-white">
+              <Star className="w-10 h-10 text-yellow-300 mb-4" />
+              <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
+              <p className="font-bold text-right">— B.B. King</p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
   );
 };
+
+export default Dashboard;

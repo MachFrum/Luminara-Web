@@ -1,202 +1,11 @@
+
 import React, { useState } from 'react';
-import styled from '@emotion/styled';
-import { Search, Filter, Plus } from 'lucide-react';
-import { ProblemPreview } from '../components/problems/ProblemPreview';
-import { PulsingActionButton } from '../components/common/PulsingActionButton';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { useProblemHistory } from '../hooks/useProblemHistory';
 import { ProblemEntry } from '../types';
-
-const LearnContainer = styled.div`
-  padding: ${props => props.theme.spacing.lg};
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.125rem;
-  color: ${props => props.theme.colors.textSecondary};
-  margin: 0;
-`;
-
-const Controls = styled.div`
-  display: flex;
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.lg};
-  flex-wrap: wrap;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: ${props => props.theme.spacing.sm};
-  }
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  flex: 1;
-  min-width: 300px;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm} 3rem;
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  background: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.text};
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary}20;
-  }
-  
-  &::placeholder {
-    color: ${props => props.theme.colors.textSecondary};
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: ${props => props.theme.spacing.sm};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const FilterSelect = styled.select`
-  padding: ${props => props.theme.spacing.sm};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  background: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.text};
-  cursor: pointer;
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-  }
-`;
-
-const ProblemsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: ${props => props.theme.spacing.xl};
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const EmptyIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: ${props => props.theme.colors.backgroundSecondary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${props => props.theme.spacing.md} auto;
-`;
-
-const EmptyTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-`;
-
-const EmptyDescription = styled.p`
-  margin: 0 0 ${props => props.theme.spacing.md} 0;
-`;
-
-const EmptyAction = styled.button`
-  background: ${props => props.theme.colors.primary};
-  color: white;
-  border: none;
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
-  border-radius: ${props => props.theme.borderRadius};
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: ${props => props.theme.colors.primaryDark};
-    transform: translateY(-1px);
-  }
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${props => props.theme.spacing.xl};
-`;
-
-const ProblemModal = styled.div<{ isOpen: boolean }>`
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: ${props => props.isOpen ? 1 : 0};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-`;
-
-const ProblemModalContent = styled.div`
-  background: ${props => props.theme.colors.surface};
-  border-radius: ${props => props.theme.borderRadius};
-  padding: ${props => props.theme.spacing.xl};
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${props => props.theme.spacing.lg};
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.text};
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: ${props => props.theme.colors.textSecondary};
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: ${props => props.theme.borderRadius};
-  
-  &:hover {
-    background: ${props => props.theme.colors.backgroundSecondary};
-  }
-`;
+import { ProblemPreview } from '../components/problems/ProblemPreview';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { PulsingActionButton } from '../components/common/PulsingActionButton';
+import { Search, RefreshCw, X } from 'react-feather';
 
 export const Learn: React.FC = () => {
   const {
@@ -205,134 +14,114 @@ export const Learn: React.FC = () => {
     error,
     searchTerm,
     setSearchTerm,
-    selectedSubject,
-    setSelectedSubject,
-    subjects,
+    refetch,
   } = useProblemHistory();
 
   const [selectedProblem, setSelectedProblem] = useState<ProblemEntry | null>(null);
-  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
+  const [showInputModal, setShowInputModal] = useState(false);
 
-  const handleProblemClick = (problem: ProblemEntry) => {
-    setSelectedProblem(problem);
-  };
-
-  const closeModal = () => {
-    setSelectedProblem(null);
-  };
-
-  const handleNewProblem = () => {
-    setShowSubmissionModal(true);
-  };
+  const openProblemModal = (problem: ProblemEntry) => setSelectedProblem(problem);
+  const closeProblemModal = () => setSelectedProblem(null);
+  const openInputModal = () => setShowInputModal(true);
+  const closeInputModal = () => setShowInputModal(false);
 
   return (
-    <LearnContainer>
-      <Header>
-        <Title>Learning Center</Title>
-        <Subtitle>
-          Explore your problem-solving journey and submit new challenges
-        </Subtitle>
-      </Header>
-
-      <Controls>
-        <SearchContainer>
-          <SearchIcon>
-            <Search size={20} />
-          </SearchIcon>
-          <SearchInput
+    <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
+      {/* Header */}
+      <header className="mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text">Learning History</h1>
+        <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary mt-1">
+          {problems.length} problems solved
+        </p>
+        <div className="relative mt-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-light-textSecondary dark:text-dark-textSecondary" />
+          <input
             type="text"
-            placeholder="Search problems by title, tags, or description..."
+            placeholder="Search problems, topics, or tags..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-full text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-light-accent"
           />
-        </SearchContainer>
+        </div>
+      </header>
 
-        <FilterSelect
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
+      {/* Controls */}
+      <div className="mb-6">
+        <button 
+          onClick={() => refetch()} 
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-full text-light-accent hover:bg-light-accent hover:text-white dark:hover:bg-light-accent dark:hover:text-white transition-colors disabled:opacity-50"
         >
-          <option value="all">All Subjects</option>
-          {subjects.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </FilterSelect>
-      </Controls>
+          {loading ? <LoadingSpinner size={20} /> : <RefreshCw className="w-5 h-5" />}
+          <span>{loading ? 'Loading...' : 'Refresh'}</span>
+        </button>
+      </div>
 
-      {loading ? (
-        <LoadingContainer>
-          <LoadingSpinner size={32} />
-        </LoadingContainer>
-      ) : error ? (
-        <EmptyState>
-          <EmptyIcon>
-            <Filter size={40} />
-          </EmptyIcon>
-          <EmptyTitle>Error Loading Problems</EmptyTitle>
-          <EmptyDescription>{error}</EmptyDescription>
-        </EmptyState>
-      ) : problems.length === 0 ? (
-        <EmptyState>
-          <EmptyIcon>
-            <Plus size={40} />
-          </EmptyIcon>
-          <EmptyTitle>No Problems Found</EmptyTitle>
-          <EmptyDescription>
-            {searchTerm || selectedSubject !== 'all'
-              ? 'Try adjusting your search or filter criteria.'
-              : 'Get started by submitting your first problem!'}
-          </EmptyDescription>
-          {(!searchTerm && selectedSubject === 'all') && (
-            <EmptyAction onClick={handleNewProblem}>
-              Submit Your First Problem
-            </EmptyAction>
-          )}
-        </EmptyState>
-      ) : (
-        <ProblemsGrid>
-          {problems.map((problem) => (
-            <ProblemPreview
-              key={problem.id}
-              problem={problem}
-              onClick={handleProblemClick}
-            />
-          ))}
-        </ProblemsGrid>
+      {/* Problems List */}
+      <div className="space-y-4">
+        {loading && <div className="text-center"><LoadingSpinner size={40} /></div>}
+        {error && <p className="text-center text-red-500">{error}</p>}
+        {!loading && !error && problems.length === 0 && (
+          <div className="text-center py-16">
+            <h3 className="text-2xl font-bold text-light-text dark:text-dark-text">No problems found</h3>
+            <p className="text-light-textSecondary dark:text-dark-textSecondary mt-2">
+              {searchTerm ? 'Try adjusting your search terms' : 'Start solving problems to see them here'}
+            </p>
+          </div>
+        )}
+        {!loading && !error && problems.map((problem) => (
+          <ProblemPreview
+            key={problem.id}
+            problem={problem}
+            onClick={() => openProblemModal(problem)}
+          />
+        ))}
+      </div>
+
+      {/* FAB */}
+      <PulsingActionButton onClick={openInputModal} />
+
+      {/* Input Modal */}
+      {showInputModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+            <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
+              <h2 className="text-xl font-bold text-light-text dark:text-dark-text">Submit a Problem</h2>
+              <button onClick={closeInputModal} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">
+                <X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
+              </button>
+            </header>
+            <div className="p-6 overflow-y-auto">
+              {/* Add your input form here */}
+              <p className="text-light-text dark:text-dark-text">Input form will go here.</p>
+            </div>
+          </div>
+        </div>
       )}
 
-      <PulsingActionButton
-        onClick={handleNewProblem}
-        isActive={problems.length === 0}
-      />
-
-      {/* Problem Detail Modal */}
-      <ProblemModal isOpen={!!selectedProblem} onClick={closeModal}>
-        <ProblemModalContent onClick={(e) => e.stopPropagation()}>
-          <ModalHeader>
-            <ModalTitle>{selectedProblem?.title}</ModalTitle>
-            <CloseButton onClick={closeModal}>✕</CloseButton>
-          </ModalHeader>
-          {selectedProblem && (
-            <div>
-              <p><strong>Subject:</strong> {selectedProblem.subject}</p>
-              <p><strong>Difficulty:</strong> {selectedProblem.difficulty}</p>
-              <p><strong>Description:</strong> {selectedProblem.description}</p>
-              {selectedProblem.solution && (
-                <div>
-                  <h4>Solution:</h4>
-                  <p>{selectedProblem.solution}</p>
-                </div>
-              )}
-              {selectedProblem.tags.length > 0 && (
-                <div>
-                  <strong>Tags:</strong> {selectedProblem.tags.join(', ')}
-                </div>
-              )}
+      {/* Problem Details Modal */}
+      {selectedProblem && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm" onClick={closeProblemModal}>
+          <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
+              <h2 className="text-xl font-bold text-light-text dark:text-dark-text">{selectedProblem.title}</h2>
+              <button onClick={closeProblemModal} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">
+                <X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
+              </button>
+            </header>
+            <div className="p-6 overflow-y-auto text-light-text dark:text-dark-text">
+              <p><strong className="text-light-accent">Topic:</strong> {selectedProblem.topic}</p>
+              <p><strong className="text-light-accent">Tags:</strong> {selectedProblem.tags.join(', ')}</p>
+              <div className="mt-4">
+                <h3 className="font-bold text-lg mb-2">Solution:</h3>
+                <p>{selectedProblem.solution || 'No solution available.'}</p>
+              </div>
             </div>
-          )}
-        </ProblemModalContent>
-      </ProblemModal>
-    </LearnContainer>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
+
+export default Learn;

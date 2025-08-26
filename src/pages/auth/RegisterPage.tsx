@@ -1,345 +1,160 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styled from '@emotion/styled';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, User } from 'lucide-react';
-import { AuthLayout } from '../../components/auth/AuthLayout';
-import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.md};
-`;
-
-const FormTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-  text-align: center;
-`;
-
-const FormSubtitle = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  text-align: center;
-  margin: 0 0 ${props => props.theme.spacing.lg} 0;
-`;
-
-const InputGroup = styled.div`
-  position: relative;
-`;
-
-const InputLabel = styled.label`
-  display: block;
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.xs};
-`;
-
-const InputContainer = styled.div`
-  position: relative;
-`;
-
-const Input = styled.input<{ hasError?: boolean }>`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm} 3rem;
-  border: 1px solid ${props => props.hasError ? props.theme.colors.error : props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  background: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.text};
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.hasError ? props.theme.colors.error : props.theme.colors.primary};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? props.theme.colors.error : props.theme.colors.primary}20;
-  }
-  
-  &::placeholder {
-    color: ${props => props.theme.colors.textSecondary};
-  }
-`;
-
-const InputIcon = styled.div`
-  position: absolute;
-  left: ${props => props.theme.spacing.sm};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const PasswordToggle = styled.button`
-  position: absolute;
-  right: ${props => props.theme.spacing.sm};
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: ${props => props.theme.colors.textSecondary};
-  cursor: pointer;
-  padding: 0.25rem;
-  
-  &:hover {
-    color: ${props => props.theme.colors.text};
-  }
-`;
-
-const SubmitButton = styled.button<{ disabled?: boolean }>`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm};
-  background: ${props => props.disabled ? props.theme.colors.textLight : props.theme.colors.primary};
-  color: white;
-  border: none;
-  border-radius: ${props => props.theme.borderRadius};
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${props => props.theme.spacing.xs};
-  
-  &:hover:not(:disabled) {
-    background: ${props => props.theme.colors.primaryDark};
-    transform: translateY(-1px);
-  }
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.xs};
-  color: ${props => props.theme.colors.error};
-  font-size: 0.875rem;
-  margin-top: ${props => props.theme.spacing.xs};
-`;
-
-const Links = styled.div`
-  text-align: center;
-  margin-top: ${props => props.theme.spacing.lg};
-`;
-
-const StyledLink = styled(Link)`
-  color: ${props => props.theme.colors.primary};
-  text-decoration: none;
-  font-weight: 500;
-  
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const NameRow = styled.div`
-  display: flex;
-  gap: ${props => props.theme.spacing.md};
-`;
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
+import { Eye, EyeOff, Mail, Lock, User, UserPlus, ArrowRight } from 'react-feather';
 
 export const RegisterPage: React.FC = () => {
-    const { register, isLoading } = useAuth();
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
+  const { register, isLoading, error, clearError } = useAuth();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+
+  const validateField = (field: string, value: string, currentData: typeof formData) => {
+    const newErrors = { ...fieldErrors };
+    switch (field) {
+      case 'firstName':
+      case 'lastName':
+        if (!value.trim()) newErrors[field] = 'This field is required';
+        else if (value.trim().length < 2) newErrors[field] = 'Must be at least 2 characters';
+        else delete newErrors[field];
+        break;
+      case 'email':
+        if (!value) newErrors.email = 'Email is required';
+        else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) newErrors.email = 'Please enter a valid email';
+        else delete newErrors.email;
+        break;
+      case 'password':
+        if (!value) newErrors.password = 'Password is required';
+        else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/.test(value)) newErrors.password = 'Password must be 8+ characters with 1 uppercase letter and 1 number';
+        else delete newErrors.password;
+        break;
+      case 'confirmPassword':
+        if (!value) newErrors.confirmPassword = 'Please confirm your password';
+        else if (value !== currentData.password) newErrors.confirmPassword = 'Passwords do not match';
+        else delete newErrors.confirmPassword;
+        break;
+      default: break;
+    }
+    setFieldErrors(newErrors);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+    validateField(name, value, newFormData);
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    let isValid = true;
+    Object.keys(formData).forEach(key => {
+        validateField(key, formData[key as keyof typeof formData], formData);
+        if(fieldErrors[key]) isValid = false;
     });
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    const validateField = (name: string, value: string, currentFormData = formData) => {
-        let error = '';
-        switch (name) {
-            case 'firstName':
-                if (!value.trim()) error = 'First name is required';
-                else if (value.trim().length < 2) error = 'Must be at least 2 characters';
-                break;
-            case 'lastName':
-                if (!value.trim()) error = 'Last name is required';
-                else if (value.trim().length < 2) error = 'Must be at least 2 characters';
-                break;
-            case 'email':
-                if (!value) error = 'Email is required';
-                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Please enter a valid email';
-                break;
-            case 'password':
-                if (!value) error = 'Password is required';
-                else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/.test(value)) {
-                    error = 'Password must be 8+ characters with an uppercase letter and a number.';
-                }
-                break;
-            case 'confirmPassword':
-                if (!value) error = 'Please confirm your password';
-                else if (value !== currentFormData.password) error = 'Passwords do not match';
-                break;
-            default:
-                break;
-        }
-        return error;
-    };
+    if (!isValid) return;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        const newFormData = { ...formData, [name]: value };
-        setFormData(newFormData);
-        
-        const error = validateField(name, value, newFormData);
-        setErrors(prev => ({ ...prev, [name]: error }));
+    try {
+      await register(formData);
+      navigate('/auth/confirm-signup', { state: { email: formData.email } });
+    } catch (err) {
+      // Error is handled by the auth context and displayed
+    }
+  };
 
-        if (name === 'password' && newFormData.confirmPassword) {
-            const confirmError = validateField('confirmPassword', newFormData.confirmPassword, newFormData);
-            setErrors(prev => ({ ...prev, confirmPassword: confirmError }));
-        }
-    };
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#483757] via-[#d9c4b0] to-[#110c47] flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <header className="text-center mb-8">
+          <div className="inline-block p-4 bg-white/20 rounded-full mb-4">
+            <UserPlus className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-white">Create Account</h1>
+          <p className="text-white/80 mt-2">Join us and start your learning adventure</p>
+        </header>
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        let newErrors: { [key: string]: string } = {};
-        let isValid = true;
+        <main className="bg-white/95 dark:bg-dark-surface/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+          {error && (
+            <div className="bg-red-500/20 text-red-500 text-sm font-semibold p-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="w-full">
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} className={`w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.firstName ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`} />
+                </div>
+                {fieldErrors.firstName && <p className="text-red-500 text-xs mt-1">{fieldErrors.firstName}</p>}
+              </div>
+              <div className="w-full">
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} className={`w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.lastName ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`} />
+                </div>
+                {fieldErrors.lastName && <p className="text-red-500 text-xs mt-1">{fieldErrors.lastName}</p>}
+              </div>
+            </div>
+            
+            <div>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input type="email" name="email" placeholder="Email address" value={formData.email} onChange={handleChange} className={`w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`} />
+              </div>
+              {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
+            </div>
 
-        for (const key in formData) {
-            const error = validateField(key, formData[key as keyof typeof formData]);
-            if (error) {
-                newErrors[key] = error;
-                isValid = false;
-            }
-        }
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleChange} className={`w-full pl-10 pr-10 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2"><Eye className="w-5 h-5 text-gray-400" /></button>
+              </div>
+              {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
+            </div>
 
-        setErrors(newErrors);
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className={`w-full pl-10 pr-10 py-3 bg-gray-100 dark:bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 ${fieldErrors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600 focus:ring-light-accent'}`} />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2"><Eye className="w-5 h-5 text-gray-400" /></button>
+              </div>
+              {fieldErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword}</p>}
+            </div>
 
-        if (isValid) {
-            try {
-                await register(formData.firstName, formData.lastName, formData.email, formData.password);
-                navigate('/auth/confirm-signup', { state: { email: formData.email } });
-            } catch (error) {
-                setErrors({ general: error instanceof Error ? error.message : 'Registration failed' });
-            }
-        }
-    };
+            <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+              <p className="font-semibold">Password must contain:</p>
+              <ul className="list-disc list-inside ml-2">
+                <li>At least 8 characters</li>
+                <li>One uppercase letter</li>
+                <li>One number</li>
+              </ul>
+            </div>
 
-    return (
-        <AuthLayout>
-            <FormContainer onSubmit={handleSubmit}>
-                <FormTitle>Create Account</FormTitle>
-                <FormSubtitle>Join us and start your learning adventure</FormSubtitle>
+            <button type="submit" disabled={isLoading} className="w-full bg-light-accent text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-light-accent/90 transition-colors disabled:opacity-70">
+              {isLoading ? <LoadingSpinner size={24} /> : <>Create Account <ArrowRight className="w-5 h-5" /></>}
+            </button>
 
-                {errors.general && (
-                    <ErrorMessage>
-                        <AlertCircle size={16} />
-                        {errors.general}
-                    </ErrorMessage>
-                )}
-
-                <NameRow>
-                    <InputGroup style={{ flex: 1 }}>
-                        <InputLabel htmlFor="firstName">First Name</InputLabel>
-                        <InputContainer>
-                            <InputIcon><User size={20} /></InputIcon>
-                            <Input
-                                id="firstName"
-                                name="firstName"
-                                type="text"
-                                placeholder="John"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                                hasError={!!errors.firstName}
-                                disabled={isLoading}
-                            />
-                        </InputContainer>
-                        {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
-                    </InputGroup>
-                    <InputGroup style={{ flex: 1 }}>
-                        <InputLabel htmlFor="lastName">Last Name</InputLabel>
-                        <InputContainer>
-                            <InputIcon><User size={20} /></InputIcon>
-                            <Input
-                                id="lastName"
-                                name="lastName"
-                                type="text"
-                                placeholder="Doe"
-                                value={formData.lastName}
-                                onChange={handleChange}
-                                hasError={!!errors.lastName}
-                                disabled={isLoading}
-                            />
-                        </InputContainer>
-                        {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
-                    </InputGroup>
-                </NameRow>
-
-                <InputGroup>
-                    <InputLabel htmlFor="email">Email</InputLabel>
-                    <InputContainer>
-                        <InputIcon><Mail size={20} /></InputIcon>
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="Enter your email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            hasError={!!errors.email}
-                            disabled={isLoading}
-                        />
-                    </InputContainer>
-                    {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                </InputGroup>
-
-                <InputGroup>
-                    <InputLabel htmlFor="password">Password</InputLabel>
-                    <InputContainer>
-                        <InputIcon><Lock size={20} /></InputIcon>
-                        <Input
-                            id="password"
-                            name="password"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Enter your password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            hasError={!!errors.password}
-                            disabled={isLoading}
-                        />
-                        <PasswordToggle type="button" onClick={() => setShowPassword(!showPassword)}>
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </PasswordToggle>
-                    </InputContainer>
-                    {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-                </InputGroup>
-
-                <InputGroup>
-                    <InputLabel htmlFor="confirmPassword">Confirm Password</InputLabel>
-                    <InputContainer>
-                        <InputIcon><Lock size={20} /></InputIcon>
-                        <Input
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            placeholder="Confirm your password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            hasError={!!errors.confirmPassword}
-                            disabled={isLoading}
-                        />
-                        <PasswordToggle type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </PasswordToggle>
-                    </InputContainer>
-                    {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
-                </InputGroup>
-
-                <SubmitButton type="submit" disabled={isLoading}>
-                    {isLoading ? <LoadingSpinner size={20} /> : 'Create Account'}
-                </SubmitButton>
-
-                <Links>
-                    <StyledLink to="/auth/login">Already have an account? Sign In</StyledLink>
-                </Links>
-            </FormContainer>
-        </AuthLayout>
-    );
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+              Already have an account? <Link to="/auth/login" className="font-medium text-light-accent hover:underline">Sign In</Link>
+            </p>
+          </form>
+        </main>
+      </div>
+    </div>
+  );
 };
+
+export default RegisterPage;

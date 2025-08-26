@@ -1,146 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import styled from '@emotion/styled';
-import { Mail, Key, AlertCircle, CheckCircle } from 'lucide-react';
-import { AuthLayout } from '../../components/auth/AuthLayout';
-import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.md};
-`;
-
-const FormTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-  text-align: center;
-`;
-
-const FormSubtitle = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  text-align: center;
-  margin: 0 0 ${props => props.theme.spacing.lg} 0;
-`;
-
-const InputGroup = styled.div`
-  position: relative;
-`;
-
-const InputLabel = styled.label`
-  display: block;
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.xs};
-`;
-
-const InputContainer = styled.div`
-  position: relative;
-`;
-
-const Input = styled.input<{ hasError?: boolean }>`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm} 3rem;
-  border: 1px solid ${props => props.hasError ? props.theme.colors.error : props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius};
-  background: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.text};
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.hasError ? props.theme.colors.error : props.theme.colors.primary};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? props.theme.colors.error : props.theme.colors.primary}20;
-  }
-  
-  &::placeholder {
-    color: ${props => props.theme.colors.textSecondary};
-  }
-`;
-
-const InputIcon = styled.div`
-  position: absolute;
-  left: ${props => props.theme.spacing.sm};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const SubmitButton = styled.button<{ disabled?: boolean }>`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm};
-  background: ${props => props.disabled ? props.theme.colors.textLight : props.theme.colors.primary};
-  color: white;
-  border: none;
-  border-radius: ${props => props.theme.borderRadius};
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${props => props.theme.spacing.xs};
-  
-  &:hover:not(:disabled) {
-    background: ${props => props.theme.colors.primaryDark};
-    transform: translateY(-1px);
-  }
-`;
-
-const Message = styled.div<{ isSuccess?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.xs};
-  color: ${props => props.isSuccess ? props.theme.colors.success : props.theme.colors.error};
-  font-size: 0.875rem;
-  margin-top: ${props => props.theme.spacing.xs};
-`;
-
-const Links = styled.div`
-  text-align: center;
-  margin-top: ${props => props.theme.spacing.lg};
-`;
-
-const StyledLink = styled(Link)`
-  color: ${props => props.theme.colors.primary};
-  text-decoration: none;
-  font-weight: 500;
-  
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const ResendContainer = styled.div`
-  text-align: center;
-  margin-top: ${props => props.theme.spacing.md};
-  font-size: 0.875rem;
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const ResendButton = styled.button`
-  background: none;
-  border: none;
-  color: ${props => props.theme.colors.primary};
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: underline;
-  
-  &:hover {
-    color: ${props => props.theme.colors.primaryDark};
-  }
-  
-  &:disabled {
-    color: ${props => props.theme.colors.textSecondary};
-    cursor: not-allowed;
-    text-decoration: none;
-  }
-`;
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
+import { Mail, Key, CheckCircle, AlertCircle } from 'react-feather';
 
 export const ConfirmSignUpPage: React.FC = () => {
   const { confirmSignUp, resendSignUpCode } = useAuth();
@@ -202,65 +64,74 @@ export const ConfirmSignUpPage: React.FC = () => {
   };
 
   return (
-    <AuthLayout>
-      <FormContainer onSubmit={handleSubmit}>
-        <FormTitle>Verify Your Account</FormTitle>
-        <FormSubtitle>
-          We've sent a verification code to your email. Please enter it below.
-        </FormSubtitle>
+    <div className="min-h-screen bg-gradient-to-br from-[#483757] via-[#d9c4b0] to-[#110c47] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <header className="text-center mb-8">
+          <div className="inline-block p-4 bg-white/20 rounded-full mb-4">
+            <CheckCircle className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-white">Verify Your Account</h1>
+          <p className="text-white/80 mt-2">We've sent a verification code to your email. Please enter it below.</p>
+        </header>
 
-        {error && <Message><AlertCircle size={16} />{error}</Message>}
-        {successMessage && <Message isSuccess><CheckCircle size={16} />{successMessage}</Message>}
+        <main className="bg-white/95 dark:bg-dark-surface/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/20 text-red-500 text-sm font-semibold p-3 rounded-lg flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" /> {error}
+              </div>
+            )}
+            {successMessage && (
+              <div className="bg-green-500/20 text-green-600 text-sm font-semibold p-3 rounded-lg flex items-center gap-2">
+                <CheckCircle className="w-5 h-5" /> {successMessage}
+              </div>
+            )}
+            <div>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading || isResending}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-light-accent"
+                />
+              </div>
+            </div>
+            <div>
+              <div className="relative">
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Enter the 6-digit code"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  disabled={isLoading || isResending}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-light-accent"
+                />
+              </div>
+            </div>
 
-        <InputGroup>
-          <InputLabel htmlFor="email">Email</InputLabel>
-          <InputContainer>
-            <InputIcon>
-              <Mail size={20} />
-            </InputIcon>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading || isResending}
-            />
-          </InputContainer>
-        </InputGroup>
+            <button type="submit" disabled={isLoading || isResending} className="w-full bg-light-accent text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-light-accent/90 transition-colors disabled:opacity-70">
+              {isLoading ? <LoadingSpinner size={24} /> : 'Verify Account'}
+            </button>
 
-        <InputGroup>
-          <InputLabel htmlFor="code">Verification Code</InputLabel>
-          <InputContainer>
-            <InputIcon>
-              <Key size={20} />
-            </InputIcon>
-            <Input
-              id="code"
-              type="text"
-              placeholder="Enter the 6-digit code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              disabled={isLoading || isResending}
-            />
-          </InputContainer>
-        </InputGroup>
+            <div className="text-center text-sm">
+              <span className="text-gray-600 dark:text-gray-300">Didn't receive a code? </span>
+              <button type="button" onClick={handleResendCode} disabled={isResending} className="font-medium text-light-accent hover:underline disabled:text-gray-400 disabled:cursor-not-allowed">
+                {isResending ? 'Sending...' : 'Resend Code'}
+              </button>
+            </div>
 
-        <SubmitButton type="submit" disabled={isLoading || isResending}>
-          {isLoading ? <LoadingSpinner size={20} /> : 'Verify Account'}
-        </SubmitButton>
-
-        <ResendContainer>
-          Didn't receive a code?{' '}
-          <ResendButton type="button" onClick={handleResendCode} disabled={isResending}>
-            {isResending ? 'Sending...' : 'Resend Code'}
-          </ResendButton>
-        </ResendContainer>
-
-        <Links>
-          <StyledLink to="/auth/login">Back to Login</StyledLink>
-        </Links>
-      </FormContainer>
-    </AuthLayout>
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+              <Link to="/auth/login" className="font-medium text-light-accent hover:underline">Back to Login</Link>
+            </p>
+          </form>
+        </main>
+      </div>
+    </div>
   );
 };
+
+export default ConfirmSignUpPage;

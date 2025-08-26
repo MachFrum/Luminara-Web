@@ -1,150 +1,23 @@
+
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import styled from '@emotion/styled';
-import { 
-  Home, 
-  BookOpen, 
-  BarChart3, 
-  User, 
-  Settings, 
-  GraduationCap,
+import {
+  Home,
+  BookOpen,
+  BarChart2,
+  User,
+  Settings,
   Moon,
   Sun,
-  LogOut
-} from 'lucide-react';
+  LogOut,
+  Zap,
+} from 'react-feather';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
-const SidebarContainer = styled.aside`
-  width: 280px;
-  height: 100vh;
-  background: ${props => props.theme.colors.surface};
-  border-right: 1px solid ${props => props.theme.colors.border};
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 100;
-  
-  @media (max-width: 1024px) {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    
-    &.open {
-      transform: translateX(0);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const SidebarHeader = styled.div`
-  padding: ${props => props.theme.spacing.lg} ${props => props.theme.spacing.md};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-`;
-
-const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.sm};
-  color: ${props => props.theme.colors.text};
-`;
-
-const LogoIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary}, ${props => props.theme.colors.secondary});
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const LogoText = styled.h1`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-`;
-
-const Navigation = styled.nav`
-  flex: 1;
-  padding: ${props => props.theme.spacing.md} 0;
-`;
-
-const NavSection = styled.div`
-  &:not(:last-child) {
-    border-bottom: 1px solid ${props => props.theme.colors.border};
-    margin-bottom: ${props => props.theme.spacing.md};
-    padding-bottom: ${props => props.theme.spacing.md};
-  }
-`;
-
-const NavItem = styled(NavLink)`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.sm};
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
-  color: ${props => props.theme.colors.textSecondary};
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border-radius: 0 1.5rem 1.5rem 0;
-  margin-right: ${props => props.theme.spacing.sm};
-  
-  &:hover {
-    background: ${props => props.theme.colors.backgroundSecondary};
-    color: ${props => props.theme.colors.text};
-  }
-  
-  &.active {
-    background: ${props => props.theme.colors.primary}20;
-    color: ${props => props.theme.colors.primary};
-    font-weight: 500;
-    border-right: 3px solid ${props => props.theme.colors.primary};
-  }
-`;
-
-const NavButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.sm};
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
-  color: ${props => props.theme.colors.textSecondary};
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 0 1.5rem 1.5rem 0;
-  margin-right: ${props => props.theme.spacing.sm};
-  text-align: left;
-  width: calc(100% - ${props => props.theme.spacing.sm});
-  
-  &:hover {
-    background: ${props => props.theme.colors.backgroundSecondary};
-    color: ${props => props.theme.colors.text};
-  }
-`;
-
-const NavText = styled.span`
-  font-size: 0.95rem;
-`;
-
-const SidebarFooter = styled.div`
-  padding: ${props => props.theme.spacing.md};
-  border-top: 1px solid ${props => props.theme.colors.border};
-`;
-
-interface SidebarProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { logout, user } = useAuth();
-  const { toggleTheme, mode } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -152,52 +25,81 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     navigate('/auth/login');
   };
 
+  const navItems = [
+    { to: '/', icon: <Home size={20} />, text: 'Dashboard' },
+    { to: '/learn', icon: <BookOpen size={20} />, text: 'Learn' },
+    { to: '/progress', icon: <BarChart2 size={20} />, text: 'Progress' },
+    { to: '/profile', icon: <User size={20} />, text: 'Profile' },
+  ];
+
   return (
-    <SidebarContainer className={isOpen ? 'open' : ''}>
-      <SidebarHeader>
-        <Logo>
-          <LogoIcon>
-            <GraduationCap size={20} />
-          </LogoIcon>
-          <LogoText>Luminara</LogoText>
-        </Logo>
-      </SidebarHeader>
-      
-      <Navigation>
-        <NavSection>
-          <NavItem to="/" onClick={onClose}>
-            <Home size={20} />
-            <NavText>Dashboard</NavText>
-          </NavItem>
-          
-          <NavItem to="/learn" onClick={onClose}>
-            <BookOpen size={20} />
-            <NavText>Learn</NavText>
-          </NavItem>
-          
-          <NavItem to="/progress" onClick={onClose}>
-            <BarChart3 size={20} />
-            <NavText>Progress</NavText>
-          </NavItem>
-          
-          <NavItem to="/profile" onClick={onClose}>
-            <User size={20} />
-            <NavText>Profile</NavText>
-          </NavItem>
-        </NavSection>
-        
-        <NavSection>
-          <NavButton onClick={toggleTheme}>
-            {mode === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-            <NavText>{mode === 'light' ? 'Dark Mode' : 'Light Mode'}</NavText>
-          </NavButton>
-          
-          <NavButton onClick={handleLogout}>
-            <LogOut size={20} />
-            <NavText>Sign Out</NavText>
-          </NavButton>
-        </NavSection>
-      </Navigation>
-    </SidebarContainer>
+    <>
+      {/* Overlay for mobile */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+      ></div>
+
+      <aside
+        className={`fixed top-0 left-0 h-full bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text w-64 lg:w-72 transform transition-transform z-50 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="p-4 lg:p-6 border-b border-light-border dark:border-dark-border">
+            <div className="flex items-center gap-3">
+              <div className="bg-light-accent text-white p-2 rounded-full">
+                <Zap size={24} />
+              </div>
+              <h1 className="text-xl lg:text-2xl font-bold">Luminara</h1>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4 space-y-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-light-accent text-white'
+                      : 'hover:bg-light-background dark:hover:bg-dark-background'
+                  }`
+                }
+              >
+                {item.icon}
+                <span className="font-medium">{item.text}</span>
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-light-border dark:border-dark-border space-y-2">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-lg hover:bg-light-background dark:hover:bg-dark-background transition-colors"
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              <span className="font-medium">
+                {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+              </span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-light-error dark:text-dark-error hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+            >
+              <LogOut size={20} />
+              <span className="font-medium">Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };
