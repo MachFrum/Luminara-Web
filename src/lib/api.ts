@@ -85,6 +85,16 @@ export const getActivityData = async (period: 'week' | 'month'): Promise<Activit
   return [];
 };
 
+export const setGoal = async (/*goalData: any*/): Promise<any> => {
+//   try {
+//     const response = await API.post('luminaraApi', '/goals', { body: goalData });
+//     return response;
+//   } catch (error) {
+//     console.error('Error setting goal', error);
+//     throw error;
+//   }
+};
+
 export const getUserProgress = async (): Promise<any> => {
   // This function should fetch all data needed for the Progress Page.
   // Once your backend is ready, replace this mock data with a real API call.
@@ -98,20 +108,13 @@ export const getUserProgress = async (): Promise<any> => {
   }
   */
 
-  // Mock data to allow the ProgressPage to render during development
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        stats: { challengesSolved: 38, topicsLearned: 23, goalsDone: 11 },
-        activities: Array(7).fill(0).map((_, i) => ({ date: `2025-01-${15+i}`, problems: Math.floor(Math.random() * 8) + 1, minutes: Math.floor(Math.random() * 60) + 15, completed: true })),
-        achievements: [
-            { id: '1', title: 'Problem Solver', description: 'Solved 50 problems', progress: 50, maxProgress: 50, unlockedAt: '2025-01-20' },
-            { id: '2', title: 'Streak Master', description: '7 days in a row', progress: 7, maxProgress: 7, unlockedAt: '2025-01-21' },
-            { id: '3', title: 'Quick Learner', description: 'Completed 5 topics', progress: 5, maxProgress: 5, unlockedAt: '2025-01-19' },
-            { id: '4', title: 'Dedicated Student', description: '42 hours learned', progress: 42, maxProgress: 50, unlockedAt: '2025-01-18' },
-        ],
-      });
-    }, 500);
+  // Return empty data structure to prevent crashes during development
+  return Promise.resolve({
+    stats: { challengesSolved: 0, topicsLearned: 0, goalsDone: 0, totalPoints: 0, level: 1, rank: 'Beginner' },
+    activities: [],
+    subjects: [],
+    achievements: [],
+    goals: [],
   });
 };
 

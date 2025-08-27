@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { ActivityChart } from '../components/common/ActivityChart';
 import { ProgressRing } from '../components/common/ProgressRing';
@@ -8,34 +8,51 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Target, Heart, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
 import { getUserProgress } from '../lib/api';
 
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 export const ProgressPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [progressData, setProgressData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAchievementsModal, setShowAchievementsModal] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('week');
 
-  useEffect(() => {
-    const loadProgressData = async () => {
-      try {
-        const data = await getUserProgress();
-        setProgressData(data);
-      } catch (err) {
-        setError('Failed to load progress data.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProgressData();
+  const loadProgressData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getUserProgress();
+      setProgressData(data);
+    } catch (err) {
+      setError('Failed to load progress data.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadProgressData();
+  }, [loadProgressData]);
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen"><LoadingSpinner size={40} /></div>;
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
+    return (
+      <div className="flex flex-col justify-center items-center h-screen">
+        <p className="text-red-500 text-lg mb-4">{error}</p>
+        <button
+          onClick={loadProgressData}
+          className="px-4 py-2 bg-light-accent text-white rounded-full hover:bg-light-accent/80 transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -77,7 +94,10 @@ export const ProgressPage: React.FC = () => {
           <SectionCard>
             <SectionHeader title="Topic Progress" />
             <div className="space-y-4">
-              {progressData.subjects.map((subject:any) => <SubjectCard key={subject.id} subject={subject} />)}
+              {progressData.subjects && Array.isArray(progressData.subjects) ? progressData.subjects.map((subject:any) => <SubjectCard key={subject.id} subject={subject} />) : <div className="text-center py-8">
+    <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary mb-4">Solve your first problem to see your progress here!</p>
+    <button onClick={() => navigate('/learn')} className="px-6 py-2 bg-light-accent text-white rounded-full hover:bg-light-accent/80 transition-colors">Start Learning</button>
+</div>}
             </div>
           </SectionCard>
 
@@ -85,7 +105,7 @@ export const ProgressPage: React.FC = () => {
           <SectionCard>
             <SectionHeader title="Current Goals" />
             <div className="space-y-4">
-              {progressData.goals.map((goal:any) => <GoalCard key={goal.id} goal={goal} />)}
+              {progressData.goals && Array.isArray(progressData.goals) ? progressData.goals.map((goal:any) => <GoalCard key={goal.id} goal={goal} />) : <p className="text-light-textSecondary dark:text-dark-textSecondary">No current goals.</p>}
             </div>
           </SectionCard>
         </div>
@@ -95,7 +115,7 @@ export const ProgressPage: React.FC = () => {
           <SectionCard>
             <SectionHeader title="Recent Achievements" onSeeAll={() => setShowAchievementsModal(true)} />
             <div className="space-y-4">
-              {progressData.achievements.slice(0, 3).map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />)}
+              {progressData.achievements && Array.isArray(progressData.achievements) ? progressData.achievements.slice(0, 3).map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />) : <p className="text-light-textSecondary dark:text-dark-textSecondary">No recent achievements.</p>}
             </div>
           </SectionCard>
 
@@ -109,7 +129,7 @@ export const ProgressPage: React.FC = () => {
       </div>
 
       {/* Achievements Modal */}
-      {showAchievementsModal && <AchievementsModal achievements={progressData.achievements} onClose={() => setShowAchievementsModal(false)} />}
+      {showAchievementsModal && progressData.achievements && Array.isArray(progressData.achievements) && <AchievementsModal achievements={progressData.achievements} onClose={() => setShowAchievementsModal(false)} />}
     </div>
   );
 };
@@ -184,7 +204,7 @@ const AchievementsModal: React.FC<{ achievements: any[]; onClose: () => void }> 
         <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border"><X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" /></button>
       </header>
       <div className="p-6 overflow-y-auto space-y-4">
-        {achievements.map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />)}
+        {achievements && Array.isArray(achievements) ? achievements.map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />) : <p className="text-light-textSecondary dark:text-dark-textSecondary">No achievements yet.</p>}
       </div>
     </div>
   </div>

@@ -4,14 +4,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GuestBanner } from '../components/common/GuestBanner';
 import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Cpu } from 'react-feather';
+import { SetGoalModal } from '../components/common/SetGoalModal';
 import { getDashboardData } from '../lib/api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
-const quickActions = [
+const quickActions: QuickAction[] = [
   { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
-  { id: '2', title: 'View Progress', description: 'Track your learning journey.', icon: TrendingUp, color: 'text-light-accent', route: '/progress' },
   { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
   { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
+  { id: '5', title: 'Set Goal', description: 'Define your learning objectives.', icon: Target, color: 'text-light-accent', route: '#', onClick: () => setShowSetGoalModal(true) },
 ];
 
 const getDifficultyClass = (difficulty: string) => {
@@ -174,6 +175,16 @@ export const Dashboard: React.FC = () => {
           </section>
         </div>
       </div>
+    {showSetGoalModal && (
+        <SetGoalModal
+          onClose={() => setShowSetGoalModal(false)}
+          onSave={(goal) => {
+            console.log('Goal saved:', goal);
+            setShowSetGoalModal(false);
+            navigate('/progress');
+          }}
+        />
+      )}
     </div>
   );
 };
