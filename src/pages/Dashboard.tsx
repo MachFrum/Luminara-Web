@@ -90,21 +90,21 @@ export const Dashboard: React.FC = () => {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+        <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[35px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
           <BookOpen className="w-8 h-8 text-light-accent" />
           <div>
             <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.problemsSolved || 0}</p>
             <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
           </div>
         </div>
-        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+        <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[35px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
           <Clock className="w-8 h-8 text-light-accent" />
           <div>
             <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.hoursLearned || 0}</p>
             <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
           </div>
         </div>
-        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+        <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[35px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
           <Zap className="w-8 h-8 text-red-500" />
           <div>
             <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.streak || 0}</p>
@@ -122,7 +122,7 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {quickActions.map(action => (
-                <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md text-left hover:scale-105 transition-transform">
+                <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform">
                   <action.icon className={`w-8 h-8 ${action.color} mb-3`} />
                   <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{action.title}</h3>
                   <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{action.description}</p>
@@ -136,7 +136,7 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Activity</h2>
             <div className="space-y-4">
               {dashboardData?.recentProblems?.map((activity: any) => (
-                <div key={activity.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-2xl shadow-md flex items-center gap-4">
+                <div key={activity.id} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
                   <div className="flex-1">
                     <h3 className="font-bold text-light-text dark:text-dark-text">{activity.title}</h3>
                     <p className="text-sm text-light-accent">{activity.subject}</p>
@@ -157,7 +157,7 @@ export const Dashboard: React.FC = () => {
           {/* Achievements Progress */}
           <section>
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Achievements</h2>
-            <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md space-y-6">
+            <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md space-y-6">
               {dashboardData?.achievements?.map((achievement: any) => (
                 <div key={achievement.id}>
                   <div className="flex items-center gap-4">
@@ -180,7 +180,7 @@ export const Dashboard: React.FC = () => {
 
           {/* Motivational Quote */}
           <section>
-            <div className="bg-gradient-to-br from-light-deepNavy to-light-accent p-6 rounded-2xl shadow-lg text-white">
+            <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
               <Star className="w-10 h-10 text-yellow-300 mb-4" />
               <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
               <p className="font-bold text-right">— B.B. King</p>
