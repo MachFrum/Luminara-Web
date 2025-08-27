@@ -83,12 +83,12 @@ export const Dashboard: React.FC = () => {
       {isGuest && <GuestBanner onSignUpClick={handleGuestSignUp} onClose={() => {}} />}
 
       {/* Header Section */}
-      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-8 rounded-b-[32px] border-[1.5px] border-[#d9c4b0] shadow-md mb-8">
+      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl pt-16 pb-8 px-6 rounded-b-[32px] border-[1.5px] border-[#d9c4b0] shadow-md mb-8">
         <header className="mb-8 text-center">
           <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text mt-1">Ready to learn something new?</h1>
         </header>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-[1.5px] border-[#d9c4b0] rounded-[35px] p-5">
           <div className="flex items-center justify-center gap-4">
             <BookOpen className="w-8 h-8 text-light-accent" />
             <div>
@@ -122,10 +122,12 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {quickActions.map(action => (
-                <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform">
-                  <action.icon className={`w-8 h-8 ${action.color} mb-3`} />
-                  <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{action.title}</h3>
-                  <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{action.description}</p>
+                <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
+                  <div className="w-14 h-14 rounded-3xl flex items-center justify-center mb-3 bg-light-surface dark:bg-dark-surface shadow-md">
+                    <action.icon className={`w-8 h-8 ${action.color}`} />
+                  </div>
+                  <h3 className="font-bold text-lg text-light-text dark:text-dark-text text-center">{action.title}</h3>
+                  <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary text-center">{action.description}</p>
                 </button>
               ))}
             </div>
@@ -160,8 +162,10 @@ export const Dashboard: React.FC = () => {
             <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md space-y-6">
               {dashboardData?.achievements?.map((achievement: any) => (
                 <div key={achievement.id}>
-                  <div className="flex items-center gap-4">
-                    <Award className="w-8 h-8 text-light-accent" />
+                  <div className="flex items-center">
+                    <div className="w-14 h-14 rounded-3xl flex items-center justify-center mr-4 bg-light-surface dark:bg-dark-surface shadow-md">
+                      <Award className="w-8 h-8 text-light-accent" />
+                    </div>
                     <div>
                       <h3 className="font-bold text-light-text dark:text-dark-text">{achievement.title}</h3>
                       <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
