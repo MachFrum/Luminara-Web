@@ -79,25 +79,7 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ is
             ))}
           </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-light-border dark:border-dark-border space-y-2">
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-lg hover:bg-light-background dark:hover:bg-dark-background transition-colors"
-            >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-              <span className="font-medium">
-                {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-              </span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-light-error dark:text-dark-error hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
-            >
-              <LogOut size={20} />
-              <span className="font-medium">Sign Out</span>
-            </button>
-          </div>
+          
         </div>
       </aside>
     </>

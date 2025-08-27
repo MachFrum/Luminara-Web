@@ -113,7 +113,6 @@ export const ProfilePage: React.FC = () => {
                                     <button 
                                         key={item.label} 
                                         onClick={'onPress' in item ? item.onPress : undefined} 
-                                        disabled={'toggle' in item}
                                         className={`w-full flex items-center p-4 text-left transition-colors duration-200 ${index !== 0 ? 'border-t border-light-border dark:border-dark-border' : ''} ${'toggle' in item ? '' : 'hover:bg-light-background dark:hover:bg-dark-background'}`}>
                                         <div className={`p-2 rounded-full mr-4 ${item.danger ? 'bg-red-500/20 text-red-500' : item.premium ? 'bg-yellow-500/20 text-yellow-500' : 'bg-gray-500/20 text-gray-500'}`}>
                                             <item.icon size={20} />

@@ -30,10 +30,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    const root = window.document.documentElement;
+    if (mode === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
     document.body.style.backgroundColor = theme.colors.background;
     document.body.style.color = theme.colors.text;
     document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
-  }, [theme]);
+  }, [theme, mode]);
 
   const value = {
     theme,
