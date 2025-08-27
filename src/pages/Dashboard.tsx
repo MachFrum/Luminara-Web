@@ -82,33 +82,33 @@ export const Dashboard: React.FC = () => {
     <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
       {isGuest && <GuestBanner onSignUpClick={handleGuestSignUp} onClose={() => {}} />}
 
-      {/* Header */}
-      <header className="mb-8">
-        <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
-        <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text mt-1">Ready to learn something new?</h1>
-      </header>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[35px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
-          <BookOpen className="w-8 h-8 text-light-accent" />
-          <div>
-            <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.problemsSolved || 0}</p>
-            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
+      {/* Header Section */}
+      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-8 rounded-b-[32px] border-[1.5px] border-[#d9c4b0] shadow-md mb-8">
+        <header className="mb-8 text-center">
+          <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text mt-1">Ready to learn something new?</h1>
+        </header>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex items-center justify-center gap-4">
+            <BookOpen className="w-8 h-8 text-light-accent" />
+            <div>
+              <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.problemsSolved || 0}</p>
+              <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
+            </div>
           </div>
-        </div>
-        <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[35px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
-          <Clock className="w-8 h-8 text-light-accent" />
-          <div>
-            <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.hoursLearned || 0}</p>
-            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
+          <div className="flex items-center justify-center gap-4">
+            <Clock className="w-8 h-8 text-light-accent" />
+            <div>
+              <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.hoursLearned || 0}</p>
+              <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
+            </div>
           </div>
-        </div>
-        <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[35px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
-          <Zap className="w-8 h-8 text-red-500" />
-          <div>
-            <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.streak || 0}</p>
-            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
+          <div className="flex items-center justify-center gap-4">
+            <Zap className="w-8 h-8 text-red-500" />
+            <div>
+              <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.streak || 0}</p>
+              <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
+            </div>
           </div>
         </div>
       </div>
