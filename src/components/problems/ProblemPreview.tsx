@@ -33,7 +33,7 @@ interface ProblemPreviewProps {
 
 export const ProblemPreview: React.FC<ProblemPreviewProps> = ({ problem, onClick }) => {
   return (
-    <div onClick={() => onClick(problem)} className="bg-light-surface dark:bg-dark-surface p-4 sm:p-5 rounded-2xl shadow-md cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-in-out relative overflow-hidden border border-light-border dark:border-dark-border">
+    <div onClick={() => onClick(problem)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 sm:p-5 rounded-[24px] shadow-md cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300 ease-in-out relative overflow-hidden border-[1.5px] border-[#d9c4b0]">
         <div className={`absolute top-0 left-0 h-1 w-full ${problem.status === 'solved' ? 'bg-green-500' : problem.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
         <div className="flex justify-between items-start gap-4">
             <h3 className="font-bold text-lg text-light-text dark:text-dark-text mb-2">{problem.title}</h3>
