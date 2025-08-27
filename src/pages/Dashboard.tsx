@@ -8,12 +8,17 @@ import { SetGoalModal } from '../components/common/SetGoalModal';
 import { getDashboardData } from '../lib/api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
-const quickActions: QuickAction[] = [
-  { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
-  { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
-  { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
-  { id: '5', title: 'Set Goal', description: 'Define your learning objectives.', icon: Target, color: 'text-light-accent', route: '#', onClick: () => setShowSetGoalModal(true) },
-];
+interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  route: string;
+  onClick?: () => void;
+}
+
+
 
 const getDifficultyClass = (difficulty: string) => {
   switch (difficulty) {
@@ -37,6 +42,14 @@ export const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSetGoalModal, setShowSetGoalModal] = useState(false);
+
+  const quickActions: QuickAction[] = [
+    { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
+    { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
+    { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
+    { id: '5', title: 'Set Goal', description: 'Define your learning objectives.', icon: Target, color: 'text-light-accent', route: '#', onClick: () => setShowSetGoalModal(true) },
+  ];
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -109,7 +122,7 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {quickActions.map(action => (
-                <button key={action.id} onClick={() => navigate(action.route)} className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md text-left hover:scale-105 transition-transform">
+                <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md text-left hover:scale-105 transition-transform">
                   <action.icon className={`w-8 h-8 ${action.color} mb-3`} />
                   <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{action.title}</h3>
                   <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{action.description}</p>
