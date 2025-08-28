@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
@@ -7,9 +6,7 @@ import { ProgressRing } from '../components/common/ProgressRing';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Target, Heart, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
 import { getUserProgress } from '../lib/api';
-
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 export const ProgressPage: React.FC = () => {
   const { user } = useAuth();
@@ -58,7 +55,7 @@ export const ProgressPage: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
       {/* Header */}
-      <header className="bg-gradient-to-br from-light-surface to-light-charcoal dark:from-dark-surface dark:to-dark-charcoal p-6 sm:p-8 rounded-3xl shadow-lg mb-8">
+      <header className="bg-gradient-to-br from-light-surface to-light-charcoal dark:from-dark-surface dark:to-dark-charcoal p-6 sm:p-8 rounded-[30px] shadow-lg mb-8">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-light-primary dark:text-dark-primary">Your Progress</h1>
@@ -148,7 +145,7 @@ const SectionHeader: React.FC<{ title: string; onSeeAll?: () => void; children?:
 );
 
 const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; color: string }> = ({ icon, label, value, color }) => (
-  <div className="bg-white/10 dark:bg-black/20 p-4 rounded-xl flex items-center gap-4 backdrop-blur-sm">
+  <div className="bg-gradient-to-br from-white/20 to-white/5 dark:from-black/20 dark:to-black/5 p-4 rounded-xl flex items-center gap-4 backdrop-blur-sm">
     <div className="p-2 rounded-full" style={{ backgroundColor: `${color}33`, color }}>{icon}</div>
     <div>
       <p className="text-2xl font-bold text-light-primary dark:text-dark-primary"><AnimatedCounter targetValue={value} /></p>
@@ -158,7 +155,7 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; 
 );
 
 const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
-  <div className="flex items-center gap-4 p-3 bg-light-background dark:bg-dark-background rounded-lg">
+  <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-[40px] border-[1.5px] border-[#d9c4b0]">
     <ProgressRing progress={subject.progress} size={50} strokeWidth={5} color={subject.color} />
     <div className="flex-1">
       <p className="font-bold text-light-text dark:text-dark-text">{subject.name}</p>
@@ -169,8 +166,8 @@ const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
 );
 
 const GoalCard: React.FC<{ goal: any }> = ({ goal }) => (
-  <div className="p-4 border border-light-border dark:border-dark-border rounded-lg">
-    <div className="flex items-center gap-3 mb-2">
+  <div className="p-5 bg-light-background dark:bg-dark-background rounded-[40px] border-[1.5px] border-[#d9c4b0]">
+    <div className="flex items-center gap-3 mb-3">
       <div className="p-2 rounded-full bg-light-accent/20 text-light-accent"><Target className="w-5 h-5" /></div>
       <div>
         <p className="font-bold text-light-text dark:text-dark-text">{goal.title}</p>
@@ -187,18 +184,19 @@ const GoalCard: React.FC<{ goal: any }> = ({ goal }) => (
 );
 
 const AchievementPill: React.FC<{ achievement: any }> = ({ achievement }) => (
-  <div className="flex items-center gap-3 p-3 border border-light-border dark:border-dark-border rounded-lg">
-    <div className="p-2 rounded-full" style={{ backgroundColor: `${achievement.color}33`, color: achievement.color }}><Award className="w-5 h-5" /></div>
-    <div>
-      <p className="font-bold text-sm text-light-text dark:text-dark-text">{achievement.title}</p>
-      <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
+    <div className="flex items-center gap-4 p-3 bg-gradient-to-br from-light-surface/60 to-light-accent/20 dark:from-dark-surface/60 dark:to-dark-accent/20 rounded-full border border-light-border dark:border-dark-border">
+        <div className="p-2 rounded-full" style={{ backgroundColor: `${achievement.color}33`, color: achievement.color }}><Award className="w-5 h-5" /></div>
+        <div className="flex-1">
+            <p className="font-bold text-sm text-light-text dark:text-dark-text">{achievement.title}</p>
+            <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
+        </div>
+        <div className="text-xs font-semibold text-light-text dark:text-dark-text">{achievement.progress}/{achievement.maxProgress}</div>
     </div>
-  </div>
 );
 
 const AchievementsModal: React.FC<{ achievements: any[]; onClose: () => void }> = ({ achievements, onClose }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-    <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+    <div className="bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[50px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
       <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
         <h2 className="text-xl font-bold text-light-text dark:text-dark-text">All Achievements</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border"><X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" /></button>
