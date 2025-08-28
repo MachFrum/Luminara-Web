@@ -47,9 +47,26 @@ export const Dashboard: React.FC = () => {
   const quickActions: QuickAction[] = [
     { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
     { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '#', onClick: () => setShowChallengesModal(true) },
-    { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
     { id: '5', title: 'Set Goal', description: 'Define your learning objectives.', icon: Target, color: 'text-light-accent', route: '#', onClick: () => setShowSetGoalModal(true) },
   ];
+
+  const profileAction: QuickAction = {
+    id: 'profile',
+    title: 'Complete Profile',
+    description: 'Fill in your mandatory profile details.',
+    icon: User, // Assuming User icon is imported from react-feather
+    color: 'text-yellow-500', // A distinct color for this action
+    route: '/profile',
+  };
+
+  const achievementsAction: QuickAction = {
+    id: '4',
+    title: 'Achievements',
+    description: 'View your achievements.',
+    icon: Award,
+    color: 'text-light-accent',
+    route: '/achievements',
+  };
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -192,6 +209,50 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div className="mt-3">
                       <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2.5">
+                        <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
+                      </div>
+                      <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Motivational Quote */}
+            <section>
+              <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
+                <Star className="w-10 h-10 text-yellow-300 mb-4" />
+                <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
+                <p className="font-bold text-right">— B.B. King</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      {showSetGoalModal && (
+        <SetGoalModal
+          onClose={() => setShowSetGoalModal(false)}
+          onSave={(goal) => {
+            console.log('Goal saved:', goal);
+            setShowSetGoalModal(false);
+            navigate('/progress');
+          }}
+        />
+      )}
+
+      {showChallengesModal && (
+        <ChallengesModal 
+          onClose={() => setShowChallengesModal(false)}
+          onSubmit={handleStartChallenge}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
+h-2.5">
                         <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
                       </div>
                       <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>

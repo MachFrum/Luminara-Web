@@ -145,6 +145,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     isLoading,
     isGuest,
+    isProfileComplete,
+    login,
+    register,
+    confirmSignUp,
+    resendSignUpCode,
+    logout,
+    resetPassword,
+    enterGuestMode,
+    exitGuestMode,
+    updateProfile,
+    error,
+    clearError,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};ontext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};const value = {
+    user,
+    isAuthenticated,
+    isLoading,
+    isGuest,
     login,
     register,
     confirmSignUp,
