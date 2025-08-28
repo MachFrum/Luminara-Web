@@ -7,6 +7,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   isGuest: boolean;
+  isProfileComplete: boolean; // Added
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   confirmSignUp: (email: string, code: string) => Promise<void>;
@@ -31,8 +32,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isProfileComplete, setIsProfileComplete] = useState(false); // Added
 
   const isAuthenticated = !!user && !isGuest;
+
+  // Helper to check if mandatory profile fields are filled
+  const checkProfileCompletion = (currentUser: User | null) => {
+    if (!currentUser) return false;
+    const { firstName, lastName, preferredUsername, age } = currentUser;
+    return !!firstName && !!lastName && !!preferredUsername && !!age;
+  };
 
   useEffect(() => {
     checkAuthState();
@@ -41,9 +50,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const checkAuthState = async () => {
     try {
       const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
+      if (currentUser) {
+        const profileCompleted = checkProfileCompletion(currentUser);
+        setUser({ ...currentUser, isProfileComplete: profileCompleted });
+        setIsProfileComplete(profileCompleted);
+      } else {
+        setUser(null);
+        setIsProfileComplete(false);
+      }
     } catch (error) {
       console.log('No authenticated user found');
+      setUser(null);
+      setIsProfileComplete(false);
     } finally {
       setIsLoading(false);
     }
@@ -54,9 +72,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null); // Clear any previous errors
     try {
       const user = await authService.signIn(email, password);
-      setUser(user);
+      const profileCompleted = checkProfileCompletion(user); // Check on login
+      setUser({ ...user, isProfileComplete: profileCompleted });
+      setIsProfileComplete(profileCompleted);
       setIsGuest(false);
-      
+
       if (rememberMe) {
         localStorage.setItem('rememberUser', 'true');
       }
@@ -93,6 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await authService.signOut();
       setUser(null);
       setIsGuest(false);
+      setIsProfileComplete(false); // Reset on logout
       localStorage.removeItem('rememberUser');
     } finally {
       setIsLoading(false);
@@ -105,6 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const enterGuestMode = () => {
     setIsGuest(true);
+    setIsProfileComplete(true); // Guests don't have a profile to complete
     setUser({
       id: 'guest',
       email: '',
@@ -118,11 +140,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       problemsSolved: 0,
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
+      isProfileComplete: true, // Guests are considered complete
     });
   };
 
   const exitGuestMode = () => {
     setIsGuest(false);
+    setIsProfileComplete(false); // Reset on exit guest mode
     setUser(null);
   };
 
@@ -132,10 +156,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateProfile = async (updates: Partial<User>) => {
     if (!user) throw new Error('No user to update');
-    
+
     const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    
+    const profileCompleted = checkProfileCompletion(updatedUser);
+    setUser({ ...updatedUser, isProfileComplete: profileCompleted });
+    setIsProfileComplete(profileCompleted);
+
     // Here you would typically make an API call to update the user profile
     // await authService.updateProfile(updates);
   };
@@ -145,43 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     isLoading,
     isGuest,
-    isProfileComplete,
-    login,
-    register,
-    confirmSignUp,
-    resendSignUpCode,
-    logout,
-    resetPassword,
-    enterGuestMode,
-    exitGuestMode,
-    updateProfile,
-    error,
-    clearError,
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};ontext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};const value = {
-    user,
-    isAuthenticated,
-    isLoading,
-    isGuest,
+    isProfileComplete, // Added
     login,
     register,
     confirmSignUp,

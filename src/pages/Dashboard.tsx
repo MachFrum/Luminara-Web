@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GuestBanner } from '../components/common/GuestBanner';
-import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Cpu } from 'react-feather';
+import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Cpu, User } from 'react-feather'; // Added User
 import { SetGoalModal } from '../components/common/SetGoalModal';
 import { ChallengesModal, ChallengeData } from '../components/common/ChallengesModal';
 import { getDashboardData, startChallenge } from '../lib/api';
@@ -36,7 +36,7 @@ const getGreeting = () => {
 };
 
 export const Dashboard: React.FC = () => {
-  const { user, isGuest, exitGuestMode } = useAuth();
+  const { user, isGuest, exitGuestMode, isProfileComplete } = useAuth(); // Added isProfileComplete
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -50,16 +50,16 @@ export const Dashboard: React.FC = () => {
     { id: '5', title: 'Set Goal', description: 'Define your learning objectives.', icon: Target, color: 'text-light-accent', route: '#', onClick: () => setShowSetGoalModal(true) },
   ];
 
-  const profileAction: QuickAction = {
+  const profileAction: QuickAction = { // Added
     id: 'profile',
     title: 'Complete Profile',
     description: 'Fill in your mandatory profile details.',
-    icon: User, // Assuming User icon is imported from react-feather
-    color: 'text-yellow-500', // A distinct color for this action
+    icon: User,
+    color: 'text-yellow-500',
     route: '/profile',
   };
 
-  const achievementsAction: QuickAction = {
+  const achievementsAction: QuickAction = { // Added
     id: '4',
     title: 'Achievements',
     description: 'View your achievements.',
@@ -166,6 +166,23 @@ export const Dashboard: React.FC = () => {
                     <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary text-center">{action.description}</p>
                   </button>
                 ))}
+                {isProfileComplete ? (
+                  <button key={achievementsAction.id} onClick={() => achievementsAction.onClick ? achievementsAction.onClick() : navigate(achievementsAction.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
+                    <div className="w-14 h-14 rounded-3xl flex items-center justify-center mb-3 bg-light-surface dark:bg-dark-surface shadow-md">
+                      <achievementsAction.icon className={`w-8 h-8 ${achievementsAction.color}`} />
+                    </div>
+                    <h3 className="font-bold text-lg text-light-text dark:text-dark-text text-center">{achievementsAction.title}</h3>
+                    <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary text-center">{achievementsAction.description}</p>
+                  </button>
+                ) : (
+                  <button key={profileAction.id} onClick={() => profileAction.onClick ? profileAction.onClick() : navigate(profileAction.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
+                    <div className="w-14 h-14 rounded-3xl flex items-center justify-center mb-3 bg-light-surface dark:bg-dark-surface shadow-md">
+                      <profileAction.icon className={`w-8 h-8 ${profileAction.color}`} />
+                    </div>
+                    <h3 className="font-bold text-lg text-light-text dark:text-dark-text text-center">{profileAction.title}</h3>
+                    <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary text-center">{profileAction.description}</p>
+                  </button>
+                )}
               </div>
             </section>
 
@@ -203,12 +220,56 @@ export const Dashboard: React.FC = () => {
                         <Award className="w-8 h-8 text-light-accent" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-light-text dark:text-dark-text">{achievement.title}</h3>
+                        <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{achievement.title}</h3>
                         <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
                       </div>
                     </div>
                     <div className="mt-3">
                       <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2.5">
+                        <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
+                      </div>
+                      <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Motivational Quote */}
+            <section>
+              <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
+                <Star className="w-10 h-10 text-yellow-300 mb-4" />
+                <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
+                <p className="font-bold text-right">— B.B. King</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      {showSetGoalModal && (
+        <SetGoalModal
+          onClose={() => setShowSetGoalModal(false)}
+          onSave={(goal) => {
+            console.log('Goal saved:', goal);
+            setShowSetGoalModal(false);
+            navigate('/progress');
+          }}
+        />
+      )}
+
+      {showChallengesModal && (
+        <ChallengesModal
+          onClose={() => setShowChallengesModal(false)}
+          onSubmit={handleStartChallenge}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
+h-2.5">
                         <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
                       </div>
                       <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
@@ -252,32 +313,7 @@ export const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-h-2.5">
-                        <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
-                      </div>
-                      <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Motivational Quote */}
-            <section>
-              <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
-                <Star className="w-10 h-10 text-yellow-300 mb-4" />
-                <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
-                <p className="font-bold text-right">— B.B. King</p>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-
-      {showSetGoalModal && (
-        <SetGoalModal
-          onClose={() => setShowSetGoalModal(false)}
-          onSave={(goal) => {
+> {
             console.log('Goal saved:', goal);
             setShowSetGoalModal(false);
             navigate('/progress');
