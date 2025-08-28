@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -69,10 +68,10 @@ export const ProfilePage: React.FC = () => {
     return (
         <div className="bg-light-background dark:bg-dark-background min-h-screen">
             {/* Header */}
-            <header className="bg-gradient-to-br from-light-surface to-light-charcoal dark:from-dark-surface dark:to-dark-charcoal p-6 sm:p-8 rounded-b-3xl shadow-lg">
+            <header className="bg-gradient-to-br from-light-surface to-light-charcoal dark:from-dark-surface dark:to-dark-charcoal p-6 sm:p-8 rounded-b-[30px] shadow-lg">
                 <div className="text-center text-light-primary dark:text-dark-primary">
                     <div className="relative inline-block mb-4">
-                        <div className="w-24 h-24 rounded-full bg-light-accent/20 text-light-accent flex items-center justify-center text-4xl font-bold border-4 border-light-accent">
+                        <div className="w-24 h-24 rounded-full bg-light-accent/20 text-light-accent flex items-center justify-center text-4xl font-bold border-3 border-light-accent">
                             {user?.firstName?.[0] || 'G'}{user?.lastName?.[0] || 'U'}
                         </div>
                         <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-light-surface dark:border-dark-surface"></div>
@@ -85,16 +84,16 @@ export const ProfilePage: React.FC = () => {
                     )}
                     <p className="text-sm text-light-accent font-semibold mt-1">Level {user?.level || 1} • {user?.rank || 'Beginner'}</p>
                 </div>
-                <div className="mt-6 grid grid-cols-3 gap-4 text-center text-light-primary dark:text-dark-primary">
-                    <div>
+                <div className="mt-6 grid grid-cols-3 divide-x divide-light-border/50 dark:divide-dark-border/50 text-center text-light-primary dark:text-dark-primary">
+                    <div className="px-2">
                         <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.problemsSolved || 0} /></p>
                         <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems Solved</p>
                     </div>
-                    <div>
+                    <div className="px-2">
                         <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.topicsLearned || 0} /></p>
                         <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Topics Learned</p>
                     </div>
-                    <div>
+                    <div className="px-2">
                         <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.streak || 0} /></p>
                         <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
                     </div>
@@ -108,12 +107,12 @@ export const ProfilePage: React.FC = () => {
                     {settingsGroups.map((group) => (
                         <section key={group.title}>
                             <h2 className="text-sm font-semibold text-light-textSecondary dark:text-dark-textSecondary uppercase tracking-wider mb-3 px-2">{group.title}</h2>
-                            <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-md">
-                                {group.items.map((item, index) => (
+                            <div className="space-y-3">
+                                {group.items.map((item) => (
                                     <button 
                                         key={item.label} 
                                         onClick={'onPress' in item ? item.onPress : undefined} 
-                                        className={`w-full flex items-center p-4 text-left transition-colors duration-200 ${index !== 0 ? 'border-t border-light-border dark:border-dark-border' : ''} ${'toggle' in item ? '' : 'hover:bg-light-background dark:hover:bg-dark-background'}`}>
+                                        className={`w-full flex items-center p-4 text-left transition-all duration-200 bg-light-surface dark:bg-dark-surface rounded-[40px] border border-[#d9c4b0] shadow-md hover:shadow-lg hover:scale-105`}>
                                         <div className={`p-2 rounded-full mr-4 ${item.danger ? 'bg-red-500/20 text-red-500' : item.premium ? 'bg-yellow-500/20 text-yellow-500' : 'bg-gray-500/20 text-gray-500'}`}>
                                             <item.icon size={20} />
                                         </div>
