@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -193,7 +192,7 @@ export const Dashboard: React.FC = () => {
                 {dashboardData?.recentProblems?.map((activity: any) => (
                   <div key={activity.id} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[45px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
                     <div className="flex-1">
-                      <h3 className="font-bold text-light-text dark:text-dark-text">{activity.title}</h3>
+                      <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{activity.title}</h3>
                       <p className="text-sm text-light-accent">{activity.subject}</p>
                       <div className="flex items-center justify-between mt-2">
                         <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{new Date(activity.submittedAt).toLocaleDateString()}</p>
@@ -260,69 +259,6 @@ export const Dashboard: React.FC = () => {
 
       {showChallengesModal && (
         <ChallengesModal
-          onClose={() => setShowChallengesModal(false)}
-          onSubmit={handleStartChallenge}
-        />
-      )}
-    </div>
-  );
-};
-
-export default Dashboard;
-h-2.5">
-                        <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
-                      </div>
-                      <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Motivational Quote */}
-            <section>
-              <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
-                <Star className="w-10 h-10 text-yellow-300 mb-4" />
-                <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
-                <p className="font-bold text-right">— B.B. King</p>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-
-      {showSetGoalModal && (
-        <SetGoalModal
-          onClose={() => setShowSetGoalModal(false)}
-          onSave={(goal) => {
-            console.log('Goal saved:', goal);
-            setShowSetGoalModal(false);
-            navigate('/progress');
-          }}
-        />
-      )}
-
-      {showChallengesModal && (
-        <ChallengesModal 
-          onClose={() => setShowChallengesModal(false)}
-          onSubmit={handleStartChallenge}
-        />
-      )}
-    </div>
-  );
-};
-
-export default Dashboard;
-> {
-            console.log('Goal saved:', goal);
-            setShowSetGoalModal(false);
-            navigate('/progress');
-          }}
-        />
-      )}
-
-      {showChallengesModal && (
-        <ChallengesModal 
           onClose={() => setShowChallengesModal(false)}
           onSubmit={handleStartChallenge}
         />
