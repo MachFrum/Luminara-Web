@@ -37,8 +37,8 @@ export const SetGoalModal: React.FC<SetGoalModalProps> = ({ onClose, onSave }) =
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-gray-900/30 dark:bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
         <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-light-text dark:text-dark-text">Set Your Own Goal</h2>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">

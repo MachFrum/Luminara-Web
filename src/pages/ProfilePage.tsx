@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { User, Award, Bell, Moon, Sun, HelpCircle, Settings, LogOut, ChevronRight } from 'react-feather';
+import { User as UserIcon, Award, Bell, Moon, Sun, HelpCircle, Settings, LogOut, ChevronRight } from 'react-feather';
 import { GuestBanner } from '../components/common/GuestBanner';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
+import { EditProfileModal } from '../components/common/EditProfileModal';
+import { updateUserProfile } from '../lib/api';
+import { User } from '../types';
 
 const Switch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
   <button
@@ -23,11 +26,12 @@ const Switch = ({ checked, onChange }: { checked: boolean; onChange: () => void 
 );
 
 export const ProfilePage: React.FC = () => {
-    const { user, logout, isGuest, exitGuestMode } = useAuth();
+    const { user, logout, isGuest, exitGuestMode, updateProfile: updateUserInContext } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [showGuestBanner, setShowGuestBanner] = useState(isGuest);
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to sign out?')) {
@@ -41,11 +45,23 @@ export const ProfilePage: React.FC = () => {
         navigate('/auth/register');
     };
 
-    const settingsGroups = [
+    const handleUpdateProfile = async (profileData: Partial<User>) => {
+        try {
+            await updateUserProfile(profileData);
+            updateUserInContext(profileData); // Update local context immediately
+            alert('Profile updated successfully!');
+        } catch (error) {
+            console.error('Failed to update profile', error);
+            alert('An error occurred while updating your profile.');
+            throw error; // Re-throw to keep modal in submitting state if needed
+        }
+    };
+
+    const settingsGroups = useMemo(() => [
         {
             title: "Account",
             items: [
-                { icon: User, label: "Edit Profile", onPress: () => alert('Edit profile modal not implemented yet.') },
+                { icon: UserIcon, label: "Edit Profile", onPress: () => setShowEditProfileModal(true) },
                 { icon: Award, label: "Upgrade to Premium", onPress: () => alert('Premium upgrade not implemented yet.'), premium: true },
             ]
         },
@@ -64,7 +80,7 @@ export const ProfilePage: React.FC = () => {
                 { icon: LogOut, label: "Sign Out", onPress: handleLogout, danger: true },
             ]
         }
-    ];
+    ], [theme, notificationsEnabled, toggleTheme, handleLogout]);
 
     return (
         <div className="bg-light-background dark:bg-dark-background min-h-screen">
@@ -137,6 +153,14 @@ export const ProfilePage: React.FC = () => {
                     <p className="italic">Illuminating the path to understanding</p>
                 </footer>
             </main>
+
+            {showEditProfileModal && (
+                <EditProfileModal 
+                    user={user}
+                    onClose={() => setShowEditProfileModal(false)}
+                    onSubmit={handleUpdateProfile}
+                />
+            )}
         </div>
     );
 };

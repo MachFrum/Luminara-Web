@@ -40,7 +40,7 @@ export const SubmitProblemModal: React.FC<SubmitProblemModalProps> = ({ onClose,
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-gray-900/30 dark:bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[30px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
         <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-light-text dark:text-dark-text">Submit a Problem</h2>

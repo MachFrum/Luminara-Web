@@ -3,6 +3,13 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  middleName?: string;
+  preferredUsername?: string;
+  age?: number;
+  country?: string;
+  language?: string;
+  school?: string;
+  grade?: string;
   avatar?: string;
   level: number;
   rank: string;
@@ -12,6 +19,7 @@ export interface User {
   problemsSolved: number;
   createdAt: string;
   lastLoginAt: string;
+  isProfileComplete?: boolean;
 }
 
 export interface ProblemEntry {
@@ -44,6 +52,13 @@ export interface ProblemResult {
   explanation: string;
   confidence: number;
   processingTime: number;
+}
+
+export interface ChallengeData {
+  name: string;
+  topic: string;
+  level: 'easy' | 'medium' | 'hard';
+  questionCount: number;
 }
 
 export interface Achievement {

@@ -1,8 +1,11 @@
+
 import {
   signIn as amplifySignIn,
   signUp as amplifySignUp,
   signOut as amplifySignOut,
   getCurrentUser as amplifyGetCurrentUser,
+  fetchUserAttributes,
+  updateUserAttributes,
   resetPassword,
   confirmResetPassword,
   confirmSignUp as amplifyConfirmSignUp,
@@ -10,58 +13,63 @@ import {
 } from "aws-amplify/auth";
 import { User } from "../../types";
 
-// Helper: Map Cognito user → App User
-const mapCognitoUserToAppUser = (cognitoUser: any): User => {
-  const attributes = cognitoUser?.signInDetails?.loginId
-    ? cognitoUser.signInDetails
-    : {};
+// Helper: Map Cognito user attributes to the app's User type
+const mapCognitoUserToAppUser = (userId: string, attributes: any): User => {
+  const isProfileComplete = !!attributes.given_name &&
+                            !!attributes.family_name &&
+                            !!attributes.preferred_username &&
+                            !!attributes["custom:age"];
 
   return {
-    id: cognitoUser.userId || "",
-    email: attributes.loginId || "",
-    firstName: attributes.given_name || "John",
-    lastName: attributes.family_name || "Doe",
+    id: userId,
+    email: attributes.email || "",
+    firstName: attributes.given_name || "",
+    lastName: attributes.family_name || "",
+    middleName: attributes.middle_name || "",
+    preferredUsername: attributes.preferred_username || "",
+    age: attributes["custom:age"] ? parseInt(attributes["custom:age"], 10) : undefined,
+    country: attributes["custom:country"] || "",
+    language: attributes["custom:language"] || "",
+    school: attributes["custom:school"] || "",
+    grade: attributes["custom:grade"] || "",
     level: parseInt(attributes["custom:level"] || "1", 10),
     rank: attributes["custom:rank"] || "Beginner",
     totalPoints: parseInt(attributes["custom:totalPoints"] || "0", 10),
     streak: parseInt(attributes["custom:streak"] || "0", 10),
     hoursLearned: parseInt(attributes["custom:hoursLearned"] || "0", 10),
     problemsSolved: parseInt(attributes["custom:problemsSolved"] || "0", 10),
-    createdAt: new Date().toISOString(),
+    createdAt: attributes.created_at || new Date().toISOString(),
     lastLoginAt: new Date().toISOString(),
+    isProfileComplete,
   };
 };
 
 // --- Auth functions --- //
 
-// Sign In
 export const signIn = async (email: string, password: string): Promise<User> => {
   try {
     if (typeof password !== 'string' || password === null || password === undefined) {
       throw new Error("Password must be a valid string for signIn.");
     }
-    const { isSignedIn, nextStep } = await amplifySignIn({ username: email, password });
+    const { isSignedIn } = await amplifySignIn({ username: email, password });
 
     if (!isSignedIn) {
-      console.log("Next step required:", nextStep);
       throw new Error("User not fully signed in, more steps required.");
     }
 
-    const user = await amplifyGetCurrentUser();
-    return mapCognitoUserToAppUser(user);
+    return await getCurrentUser() as User;
   } catch (error) {
     console.error("Error signing in", error);
     throw error;
   }
 };
 
-// Sign Up
 export const signUp = async (
   firstName: string,
   lastName: string,
   email: string,
   password: string
-): Promise<User> => {
+): Promise<any> => {
   try {
     const { userId, nextStep } = await amplifySignUp({
       username: email,
@@ -76,32 +84,14 @@ export const signUp = async (
     });
 
     console.log("Sign up next step:", nextStep);
+    return { userId, nextStep };
 
-    if (!userId) {
-      throw new Error("Sign up failed: userId missing.");
-    }
-
-    return {
-      id: userId,
-      email,
-      firstName,
-      lastName,
-      level: 1,
-      rank: "Beginner",
-      totalPoints: 0,
-      streak: 0,
-      hoursLearned: 0,
-      problemsSolved: 0,
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-    };
   } catch (error) {
     console.error("Error signing up", error);
     throw error;
   }
 };
 
-// Sign Out
 export const signOut = async (): Promise<void> => {
   try {
     await amplifySignOut();
@@ -111,17 +101,36 @@ export const signOut = async (): Promise<void> => {
   }
 };
 
-// Get Current User
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
     const cognitoUser = await amplifyGetCurrentUser();
-    return mapCognitoUserToAppUser(cognitoUser);
+    const attributes = await fetchUserAttributes();
+    return mapCognitoUserToAppUser(cognitoUser.userId, attributes);
   } catch {
     return null; // not signed in
   }
 };
 
-// Forgot Password (request code)
+export const updateCognitoUserAttributes = async (attributes: Partial<User>) => {
+  try {
+    const cognitoAttributes: { [key: string]: string } = {};
+    if (attributes.firstName) cognitoAttributes.given_name = attributes.firstName;
+    if (attributes.lastName) cognitoAttributes.family_name = attributes.lastName;
+    if (attributes.middleName) cognitoAttributes.middle_name = attributes.middleName;
+    if (attributes.preferredUsername) cognitoAttributes.preferred_username = attributes.preferredUsername;
+    if (attributes.age) cognitoAttributes['custom:age'] = attributes.age.toString();
+    if (attributes.country) cognitoAttributes['custom:country'] = attributes.country;
+    if (attributes.language) cognitoAttributes['custom:language'] = attributes.language;
+    if (attributes.school) cognitoAttributes['custom:school'] = attributes.school;
+    if (attributes.grade) cognitoAttributes['custom:grade'] = attributes.grade;
+
+    await updateUserAttributes({ userAttributes: cognitoAttributes });
+  } catch (error) {
+    console.error("Error updating user attributes", error);
+    throw error;
+  }
+};
+
 export const forgotPassword = async (email: string): Promise<void> => {
   try {
     await resetPassword({ username: email });
@@ -131,7 +140,6 @@ export const forgotPassword = async (email: string): Promise<void> => {
   }
 };
 
-// Forgot Password (submit new password)
 export const forgotPasswordSubmit = async (
   email: string,
   code: string,
@@ -149,7 +157,6 @@ export const forgotPasswordSubmit = async (
   }
 };
 
-// Confirm Sign Up
 export const confirmSignUp = async (email: string, code: string): Promise<void> => {
   try {
     await amplifyConfirmSignUp({ username: email, confirmationCode: code });
@@ -159,7 +166,6 @@ export const confirmSignUp = async (email: string, code: string): Promise<void> 
   }
 };
 
-// Resend Sign Up Code
 export const resendSignUpCode = async (email: string): Promise<void> => {
   try {
     await amplifyResendSignUpCode({ username: email });

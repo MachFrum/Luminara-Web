@@ -2,7 +2,8 @@
 import { generateClient } from 'aws-amplify/api';
 import { uploadData } from 'aws-amplify/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { ProblemEntry, ProblemResult, Achievement, ActivityData } from '../types';
+import { User, ProblemEntry, ProblemResult, Achievement, ActivityData, ChallengeData } from '../types';
+import { updateCognitoUserAttributes } from './aws/cognito';
 
 const client = generateClient();
 
@@ -10,9 +11,33 @@ const client = generateClient();
 const listProblems = `query ListProblems { listProblems { items { id title ... } } }`;
 const getProblem = `query GetProblem($id: ID!) { getProblem(id: $id) { id title ... } }`;
 const createProblem = `mutation CreateProblem($input: CreateProblemInput!) { createProblem(input: $input) { id ... } }`;
+const createChallenge = `mutation CreateChallenge($input: CreateChallengeInput!) { createChallenge(input: $input) { id ... } }`;
+const updateUser = `mutation UpdateUser($input: UpdateUserInput!) { updateUser(input: $input) { id ... } }`;
 const queryUserProgress = `query GetUserProgress { getUserProgress { stats { ... } achievements { ... } } }`;
 
 // --- API Layer ---
+
+// --- User Profile API calls ---
+export const updateUserProfile = async (profileData: Partial<User>): Promise<void> => {
+  console.log('Updating user profile:', profileData);
+  try {
+    // Step 1: Update attributes in Cognito
+    await updateCognitoUserAttributes(profileData);
+
+    // Step 2: Update user data in the backend database (e.g., DynamoDB via AppSync)
+    // This assumes your backend has a corresponding 'updateUser' mutation.
+    const result = await client.graphql({
+      query: updateUser,
+      variables: { input: profileData }
+    });
+    console.log('User profile updated in backend:', result);
+
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
+};
+
 
 // --- Problem-related API calls ---
 
@@ -41,11 +66,8 @@ export const submitProblem = async (data: { text: string; file?: File }): Promis
     const problemInput = {
       description: data.text,
       fileKey: fileKey,
-      // Other fields like title, subject etc. would be extracted by the backend
     };
 
-    // We are assuming the mutation is called 'createProblem' and it accepts this input.
-    // This will likely fail until the backend is updated, but the offline logic will catch it.
     const result = await client.graphql({
       query: createProblem,
       variables: { input: problemInput }
@@ -58,95 +80,53 @@ export const submitProblem = async (data: { text: string; file?: File }): Promis
 
   } catch (error) {
     console.error('Error submitting problem:', error);
-    // Re-throw the error so the calling component knows the submission failed
-    // and can trigger the offline caching mechanism.
     throw error;
   }
 };
 
 export const getProblemHistory = async (): Promise<ProblemEntry[]> => {
-  // Example for a GraphQL API
-  /*
-  try {
-    const problemData = await client.graphql({ query: listProblems });
-    // @ts-ignore
-    return problemData.data.listProblems.items;
-  } catch (error) {
-    console.error('Error fetching problem history', error);
-    return [];
-  }
-  */
   return []; // Return empty array by default
 };
 
 export const getProblemById = async (id: string): Promise<ProblemEntry> => {
-  // Example for a REST API
-  /*
-  try {
-    const result = await API.get('luminaraApi', `/problems/${id}`, {});
-    return result;
-  } catch (error) {
-    console.error(`Error fetching problem ${id}`, error);
-    throw new Error('Failed to fetch problem');
-  }
-  */
   throw new Error('getProblemById is not implemented');
 };
+
+// --- Challenge-related API calls ---
+
+export const startChallenge = async (challengeData: ChallengeData): Promise<any> => {
+  console.log('Starting challenge:', challengeData);
+  try {
+    const result = await client.graphql({
+      query: createChallenge,
+      variables: { input: challengeData }
+    });
+    // @ts-ignore
+    console.log('Challenge submission result:', result.data.createChallenge);
+    // @ts-ignore
+    return result.data.createChallenge;
+  } catch (error) {
+    console.error('Error starting challenge:', error);
+    throw error;
+  }
+};
+
 
 // --- User Progress and Achievement API calls ---
 
 export const getAchievements = async (): Promise<Achievement[]> => {
-  // This would also be an API call in a real application
-  /*
-  try {
-    const achievementData = await client.graphql({ query: queries.listAchievements });
-    return achievementData.data.listAchievements.items;
-  } catch (error) {
-    console.error('Error fetching achievements', error);
-    return [];
-  }
-  */
   return [];
 };
 
 export const getActivityData = async (period: 'week' | 'month'): Promise<ActivityData[]> => {
-  // This would also be an API call
-  /*
-  try {
-    const activityData = await API.get('luminaraApi', `/activity/${period}`, {});
-    return activityData;
-  } catch (error) {
-    console.error('Error fetching activity data', error);
-    return [];
-  }
-  */
   return [];
 };
 
 export const setGoal = async (/*goalData: any*/): Promise<any> => {
-//   try {
-//     const response = await API.post('luminaraApi', '/goals', { body: goalData });
-//     return response;
-//   } catch (error) {
-//     console.error('Error setting goal', error);
-//     throw error;
-//   }
+  // Not implemented
 };
 
 export const getUserProgress = async (): Promise<any> => {
-  // This function should fetch all data needed for the Progress Page.
-  // Once your backend is ready, replace this mock data with a real API call.
-  /*
-  try {
-    const response = await client.graphql({ query: queryUserProgress });
-    return response.data.getUserProgress;
-  } catch (error) {
-    console.error('Error fetching user progress', error);
-    throw error;
-  }
-  */
-
-  // Return empty data structure to prevent crashes during development
   return Promise.resolve({
     stats: { challengesSolved: 0, topicsLearned: 0, goalsDone: 0, totalPoints: 0, level: 1, rank: 'Beginner' },
     activities: [],
@@ -157,10 +137,6 @@ export const getUserProgress = async (): Promise<any> => {
 };
 
 export const getDashboardData = async (): Promise<any> => {
-  // This function should fetch all data needed for the Dashboard Page.
-  // Once your backend is ready, replace this mock data with a real API call.
-  
-  // Mock data to allow the Dashboard to render during development
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({

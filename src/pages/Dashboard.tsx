@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GuestBanner } from '../components/common/GuestBanner';
 import { BookOpen, TrendingUp, Target, Clock, Star, Zap, Award, Plus, ChevronRight, Cpu } from 'react-feather';
 import { SetGoalModal } from '../components/common/SetGoalModal';
-import { getDashboardData } from '../lib/api';
+import { ChallengesModal, ChallengeData } from '../components/common/ChallengesModal';
+import { getDashboardData, startChallenge } from '../lib/api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 interface QuickAction {
@@ -40,10 +42,11 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSetGoalModal, setShowSetGoalModal] = useState(false);
+  const [showChallengesModal, setShowChallengesModal] = useState(false);
 
   const quickActions: QuickAction[] = [
     { id: '1', title: 'Start Learning', description: 'Ask a question or solve a problem.', icon: Cpu, color: 'text-light-accent', route: '/learn' },
-    { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '/groups' },
+    { id: '3', title: 'Challenges', description: 'Tackle challenging questions.', icon: Plus, color: 'text-light-accent', route: '#', onClick: () => setShowChallengesModal(true) },
     { id: '4', title: 'Achievements', description: 'View your achievements.', icon: Award, color: 'text-light-accent', route: '/achievements' },
     { id: '5', title: 'Set Goal', description: 'Define your learning objectives.', icon: Target, color: 'text-light-accent', route: '#', onClick: () => setShowSetGoalModal(true) },
   ];
@@ -67,6 +70,16 @@ export const Dashboard: React.FC = () => {
     navigate('/auth/register');
   };
 
+  const handleStartChallenge = async (challengeData: ChallengeData) => {
+    try {
+      await startChallenge(challengeData);
+      alert('Challenge started successfully! You will be notified when it is ready.');
+    } catch (err) {
+      alert('Failed to start challenge. Please try again later.');
+      throw err; // Re-throw to allow modal to handle its state
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-screen"><LoadingSpinner size={40} /></div>;
   }
@@ -82,8 +95,8 @@ export const Dashboard: React.FC = () => {
       {/* Header Section */}
       <div className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 rounded-b-[32px] shadow-lg mb-8">
         <header className="mb-8 text-center">
-          <p className="text-lg text-white/80">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mt-1">Ready to learn something new?</h1>
+          <p className="text-xl text-white/80">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1">Ready to learn something new?</h1>
         </header>
         <div className="bg-white/20 dark:bg-black/20 backdrop-blur-sm border border-white/30 rounded-[35px] p-5">
           <div className="flex flex-col sm:flex-row sm:justify-around items-center space-y-4 sm:space-y-0">
@@ -199,7 +212,8 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </main>
-    {showSetGoalModal && (
+
+      {showSetGoalModal && (
         <SetGoalModal
           onClose={() => setShowSetGoalModal(false)}
           onSave={(goal) => {
@@ -207,6 +221,13 @@ export const Dashboard: React.FC = () => {
             setShowSetGoalModal(false);
             navigate('/progress');
           }}
+        />
+      )}
+
+      {showChallengesModal && (
+        <ChallengesModal 
+          onClose={() => setShowChallengesModal(false)}
+          onSubmit={handleStartChallenge}
         />
       )}
     </div>
