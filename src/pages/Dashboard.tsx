@@ -88,22 +88,22 @@ export const Dashboard: React.FC = () => {
           <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text mt-1">Ready to learn something new?</h1>
         </header>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-[1.5px] border-[#d9c4b0] rounded-[35px] p-5">
-          <div className="flex items-center justify-center gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 sm:divide-x sm:divide-light-border dark:sm:divide-dark-border border-[1.5px] border-[#d9c4b0] rounded-[35px]">
+          <div className="flex items-center justify-center gap-4 p-5">
             <BookOpen className="w-8 h-8 text-light-accent" />
             <div>
               <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.problemsSolved || 0}</p>
               <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4 p-5">
             <Clock className="w-8 h-8 text-light-accent" />
             <div>
               <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.hoursLearned || 0}</p>
               <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4 p-5">
             <Zap className="w-8 h-8 text-red-500" />
             <div>
               <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.streak || 0}</p>
