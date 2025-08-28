@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -17,8 +16,6 @@ interface QuickAction {
   route: string;
   onClick?: () => void;
 }
-
-
 
 const getDifficultyClass = (difficulty: string) => {
   switch (difficulty) {
@@ -79,119 +76,129 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
+    <div className="bg-light-background dark:bg-dark-background min-h-screen">
       {isGuest && <GuestBanner onSignUpClick={handleGuestSignUp} onClose={() => {}} />}
 
       {/* Header Section */}
-      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl pt-16 pb-8 px-6 rounded-b-[32px] border-[1.5px] border-[#d9c4b0] shadow-md mb-8">
+      <div className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 rounded-b-[32px] shadow-lg mb-8">
         <header className="mb-8 text-center">
-          <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-light-text dark:text-dark-text mt-1">Ready to learn something new?</h1>
+          <p className="text-lg text-white/80">{getGreeting()}, {user?.firstName || 'Learner'} 👋</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mt-1">Ready to learn something new?</h1>
         </header>
-        <div className="grid grid-cols-1 sm:grid-cols-3 sm:divide-x sm:divide-light-border dark:sm:divide-dark-border border-[1.5px] border-[#d9c4b0] rounded-[35px]">
-          <div className="flex items-center justify-center gap-4 p-5">
-            <BookOpen className="w-8 h-8 text-light-accent" />
-            <div>
-              <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.problemsSolved || 0}</p>
-              <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems</p>
+        <div className="bg-white/20 dark:bg-black/20 backdrop-blur-sm border border-white/30 rounded-[35px] p-5">
+          <div className="flex flex-col sm:flex-row sm:justify-around items-center space-y-4 sm:space-y-0">
+            <div className="flex items-center justify-center gap-4">
+              <BookOpen className="w-8 h-8 text-white" />
+              <div>
+                <p className="text-2xl font-bold text-white">{user?.problemsSolved || 0}</p>
+                <p className="text-sm text-white/80">Problems</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center gap-4 p-5">
-            <Clock className="w-8 h-8 text-light-accent" />
-            <div>
-              <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.hoursLearned || 0}</p>
-              <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Hours</p>
+
+            <div className="hidden sm:block w-px h-12 bg-white/30"></div>
+
+            <div className="flex items-center justify-center gap-4">
+              <Clock className="w-8 h-8 text-white" />
+              <div>
+                <p className="text-2xl font-bold text-white">{user?.hoursLearned || 0}</p>
+                <p className="text-sm text-white/80">Hours</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center gap-4 p-5">
-            <Zap className="w-8 h-8 text-red-500" />
-            <div>
-              <p className="text-2xl font-bold text-light-text dark:text-dark-text">{user?.streak || 0}</p>
-              <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
+
+            <div className="hidden sm:block w-px h-12 bg-white/30"></div>
+
+            <div className="flex items-center justify-center gap-4">
+              <Zap className="w-8 h-8 text-yellow-300" />
+              <div>
+                <p className="text-2xl font-bold text-white">{user?.streak || 0}</p>
+                <p className="text-sm text-white/80">Day Streak</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Quick Actions */}
-          <section>
-            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {quickActions.map(action => (
-                <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
-                  <div className="w-14 h-14 rounded-3xl flex items-center justify-center mb-3 bg-light-surface dark:bg-dark-surface shadow-md">
-                    <action.icon className={`w-8 h-8 ${action.color}`} />
-                  </div>
-                  <h3 className="font-bold text-lg text-light-text dark:text-dark-text text-center">{action.title}</h3>
-                  <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary text-center">{action.description}</p>
-                </button>
-              ))}
-            </div>
-          </section>
+      <main className="p-4 sm:p-6 lg:p-8 pt-0">
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Quick Actions */}
+            <section>
+              <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {quickActions.map(action => (
+                  <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
+                    <div className="w-14 h-14 rounded-3xl flex items-center justify-center mb-3 bg-light-surface dark:bg-dark-surface shadow-md">
+                      <action.icon className={`w-8 h-8 ${action.color}`} />
+                    </div>
+                    <h3 className="font-bold text-lg text-light-text dark:text-dark-text text-center">{action.title}</h3>
+                    <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary text-center">{action.description}</p>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-          {/* Recent Activity */}
-          <section>
-            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              {dashboardData?.recentProblems?.map((activity: any) => (
-                <div key={activity.id} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-light-text dark:text-dark-text">{activity.title}</h3>
-                    <p className="text-sm text-light-accent">{activity.subject}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{new Date(activity.submittedAt).toLocaleDateString()}</p>
-                      <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${getDifficultyClass(activity.difficulty)}`}>{activity.difficulty}</span>
+            {/* Recent Activity */}
+            <section>
+              <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Activity</h2>
+              <div className="space-y-4">
+                {dashboardData?.recentProblems?.map((activity: any) => (
+                  <div key={activity.id} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[45px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-light-text dark:text-dark-text">{activity.title}</h3>
+                      <p className="text-sm text-light-accent">{activity.subject}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{new Date(activity.submittedAt).toLocaleDateString()}</p>
+                        <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${getDifficultyClass(activity.difficulty)}`}>{activity.difficulty}</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-8">
+            {/* Achievements Progress */}
+            <section>
+              <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Achievements</h2>
+              <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md space-y-6">
+                {dashboardData?.achievements?.map((achievement: any) => (
+                  <div key={achievement.id}>
+                    <div className="flex items-center">
+                      <div className="w-14 h-14 rounded-3xl flex items-center justify-center mr-4 bg-light-surface dark:bg-dark-surface shadow-md">
+                        <Award className="w-8 h-8 text-light-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-light-text dark:text-dark-text">{achievement.title}</h3>
+                        <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2.5">
+                        <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
+                      </div>
+                      <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+
+            {/* Motivational Quote */}
+            <section>
+              <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
+                <Star className="w-10 h-10 text-yellow-300 mb-4" />
+                <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
+                <p className="font-bold text-right">— B.B. King</p>
+              </div>
+            </section>
+          </div>
         </div>
-
-        {/* Right Column */}
-        <div className="space-y-8">
-          {/* Achievements Progress */}
-          <section>
-            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Achievements</h2>
-            <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md space-y-6">
-              {dashboardData?.achievements?.map((achievement: any) => (
-                <div key={achievement.id}>
-                  <div className="flex items-center">
-                    <div className="w-14 h-14 rounded-3xl flex items-center justify-center mr-4 bg-light-surface dark:bg-dark-surface shadow-md">
-                      <Award className="w-8 h-8 text-light-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-light-text dark:text-dark-text">{achievement.title}</h3>
-                      <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{achievement.description}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2.5">
-                      <div className="bg-light-accent h-2.5 rounded-full" style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}></div>
-                    </div>
-                    <p className="text-right text-xs text-light-textSecondary dark:text-dark-textSecondary mt-1">{achievement.progress}/{achievement.maxProgress}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Motivational Quote */}
-          <section>
-            <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
-              <Star className="w-10 h-10 text-yellow-300 mb-4" />
-              <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
-              <p className="font-bold text-right">— B.B. King</p>
-            </div>
-          </section>
-        </div>
-      </div>
+      </main>
     {showSetGoalModal && (
         <SetGoalModal
           onClose={() => setShowSetGoalModal(false)}

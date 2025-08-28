@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -68,34 +69,34 @@ export const ProfilePage: React.FC = () => {
     return (
         <div className="bg-light-background dark:bg-dark-background min-h-screen">
             {/* Header */}
-            <header className="bg-gradient-to-br from-light-surface to-light-charcoal dark:from-dark-surface dark:to-dark-charcoal p-6 sm:p-8 rounded-b-[30px] shadow-lg">
-                <div className="text-center text-light-primary dark:text-dark-primary">
+            <header className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white p-6 sm:p-8 rounded-b-[30px] shadow-lg">
+                <div className="text-center">
                     <div className="relative inline-block mb-4">
-                        <div className="w-24 h-24 rounded-full bg-light-accent/20 text-light-accent flex items-center justify-center text-4xl font-bold border-3 border-light-accent">
+                        <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-4xl font-bold border-3 border-white/50">
                             {user?.firstName?.[0] || 'G'}{user?.lastName?.[0] || 'U'}
                         </div>
-                        <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-light-surface dark:border-dark-surface"></div>
+                        <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-light-deepNavy"></div>
                     </div>
                     <h1 className="text-2xl font-bold">{user?.firstName || 'Guest'} {user?.lastName || 'User'}</h1>
                     {isGuest ? (
-                        <p className="text-yellow-500">Guest User</p>
+                        <p className="text-yellow-400">Guest User</p>
                     ) : (
-                        <p className="text-light-textSecondary dark:text-dark-textSecondary">{user?.email}</p>
+                        <p className="text-white/80">{user?.email}</p>
                     )}
-                    <p className="text-sm text-light-accent font-semibold mt-1">Level {user?.level || 1} • {user?.rank || 'Beginner'}</p>
+                    <p className="text-sm text-white font-semibold mt-1">Level {user?.level || 1} • {user?.rank || 'Beginner'}</p>
                 </div>
-                <div className="mt-6 grid grid-cols-3 divide-x divide-light-border/50 dark:divide-dark-border/50 text-center text-light-primary dark:text-dark-primary">
+                <div className="mt-6 grid grid-cols-3 divide-x divide-white/30 text-center">
                     <div className="px-2">
                         <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.problemsSolved || 0} /></p>
-                        <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Problems Solved</p>
+                        <p className="text-sm text-white/80">Problems Solved</p>
                     </div>
                     <div className="px-2">
                         <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.topicsLearned || 0} /></p>
-                        <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Topics Learned</p>
+                        <p className="text-sm text-white/80">Topics Learned</p>
                     </div>
                     <div className="px-2">
                         <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.streak || 0} /></p>
-                        <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">Day Streak</p>
+                        <p className="text-sm text-white/80">Day Streak</p>
                     </div>
                 </div>
             </header>

@@ -1,29 +1,56 @@
+
 import { API, graphqlOperation } from 'aws-amplify';
-import { ProblemEntry, ProblemSubmissionData, ProblemResult, Achievement, ActivityData } from '../types';
+import { Storage } from '@aws-amplify/storage';
+import { v4 as uuidv4 } from 'uuid';
+import { ProblemEntry, ProblemResult, Achievement, ActivityData } from '../types';
 
 // Example GraphQL queries (these would be in src/graphql/queries.ts, etc.)
-// const listProblems = `query ListProblems { listProblems { items { id title ... } } }`;
-// const getProblem = `query GetProblem($id: ID!) { getProblem(id: $id) { id title ... } }`;
-// const createProblem = `mutation CreateProblem($input: CreateProblemInput!) { createProblem(input: $input) { id ... } }`;
-// const queryUserProgress = `query GetUserProgress { getUserProgress { stats { ... } achievements { ... } } }`;
+const listProblems = `query ListProblems { listProblems { items { id title ... } } }`;
+const getProblem = `query GetProblem($id: ID!) { getProblem(id: $id) { id title ... } }`;
+const createProblem = `mutation CreateProblem($input: CreateProblemInput!) { createProblem(input: $input) { id ... } }`;
+const queryUserProgress = `query GetUserProgress { getUserProgress { stats { ... } achievements { ... } } }`;
 
 // --- API Layer ---
 
 // --- Problem-related API calls ---
 
-export const submitProblem = async (data: ProblemSubmissionData): Promise<ProblemResult> => {
-  // Example for a GraphQL API
-  /*
+export const submitProblem = async (data: { text: string; file?: File }): Promise<any> => {
+  console.log('Submitting problem:', data);
   try {
-    const result = await API.graphql(graphqlOperation(createProblem, { input: data }));
+    let fileKey: string | undefined = undefined;
+
+    if (data.file) {
+      const extension = data.file.name.split('.').pop();
+      const key = `uploads/${uuidv4()}.${extension}`;
+      
+      const result = await Storage.put(key, data.file, {
+        contentType: data.file.type,
+      });
+      fileKey = result.key;
+      console.log('File uploaded successfully:', fileKey);
+    }
+
+    const problemInput = {
+      description: data.text,
+      fileKey: fileKey,
+      // Other fields like title, subject etc. would be extracted by the backend
+    };
+
+    // We are assuming the mutation is called 'createProblem' and it accepts this input.
+    // This will likely fail until the backend is updated, but the offline logic will catch it.
+    const result = await API.graphql(graphqlOperation(createProblem, { input: problemInput }));
+    
+    // @ts-ignore
+    console.log('GraphQL submission result:', result.data.createProblem);
     // @ts-ignore
     return result.data.createProblem;
+
   } catch (error) {
-    console.error('Error submitting problem via GraphQL', error);
-    throw new Error('Failed to submit problem');
+    console.error('Error submitting problem:', error);
+    // Re-throw the error so the calling component knows the submission failed
+    // and can trigger the offline caching mechanism.
+    throw error;
   }
-  */
-  throw new Error('submitProblem is not implemented');
 };
 
 export const getProblemHistory = async (): Promise<ProblemEntry[]> => {

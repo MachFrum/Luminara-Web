@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
@@ -55,11 +56,11 @@ export const ProgressPage: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
       {/* Header */}
-      <header className="bg-gradient-to-br from-light-surface to-light-charcoal dark:from-dark-surface dark:to-dark-charcoal p-6 sm:p-8 rounded-[30px] shadow-lg mb-8">
+      <header className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white p-6 sm:p-8 rounded-[30px] shadow-lg mb-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-light-primary dark:text-dark-primary">Your Progress</h1>
-            <p className="text-light-textSecondary dark:text-dark-textSecondary mt-1">Level {progressData.stats.level} • {progressData.stats.rank}</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white">Your Progress</h1>
+            <p className="text-white/80 mt-1">Level {progressData.stats.level} • {progressData.stats.rank}</p>
           </div>
           <div className="flex items-center gap-2 bg-yellow-400/20 text-yellow-400 px-4 py-2 rounded-full">
             <Zap className="w-5 h-5" />
@@ -148,8 +149,8 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; 
   <div className="bg-gradient-to-br from-white/20 to-white/5 dark:from-black/20 dark:to-black/5 p-4 rounded-xl flex items-center gap-4 backdrop-blur-sm">
     <div className="p-2 rounded-full" style={{ backgroundColor: `${color}33`, color }}>{icon}</div>
     <div>
-      <p className="text-2xl font-bold text-light-primary dark:text-dark-primary"><AnimatedCounter targetValue={value} /></p>
-      <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{label}</p>
+      <p className="text-2xl font-bold text-white"><AnimatedCounter targetValue={value} /></p>
+      <p className="text-sm text-white/80">{label}</p>
     </div>
   </div>
 );
