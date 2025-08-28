@@ -1,6 +1,5 @@
-
 import { API, graphqlOperation } from 'aws-amplify';
-import { Storage } from '@aws-amplify/storage';
+import { uploadData } from 'aws-amplify/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { ProblemEntry, ProblemResult, Achievement, ActivityData } from '../types';
 
@@ -23,10 +22,16 @@ export const submitProblem = async (data: { text: string; file?: File }): Promis
       const extension = data.file.name.split('.').pop();
       const key = `uploads/${uuidv4()}.${extension}`;
       
-      const result = await Storage.put(key, data.file, {
-        contentType: data.file.type,
+      const uploadTask = uploadData({
+        path: `public/${key}`,
+        data: data.file,
+        options: {
+          contentType: data.file.type,
+        }
       });
-      fileKey = result.key;
+
+      const result = await uploadTask.result;
+      fileKey = result.path; // In v6, this is the full path
       console.log('File uploaded successfully:', fileKey);
     }
 
