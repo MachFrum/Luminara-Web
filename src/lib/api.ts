@@ -1,7 +1,10 @@
-import { API, graphqlOperation } from 'aws-amplify';
+
+import { generateClient } from 'aws-amplify/api';
 import { uploadData } from 'aws-amplify/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { ProblemEntry, ProblemResult, Achievement, ActivityData } from '../types';
+
+const client = generateClient();
 
 // Example GraphQL queries (these would be in src/graphql/queries.ts, etc.)
 const listProblems = `query ListProblems { listProblems { items { id title ... } } }`;
@@ -43,7 +46,10 @@ export const submitProblem = async (data: { text: string; file?: File }): Promis
 
     // We are assuming the mutation is called 'createProblem' and it accepts this input.
     // This will likely fail until the backend is updated, but the offline logic will catch it.
-    const result = await API.graphql(graphqlOperation(createProblem, { input: problemInput }));
+    const result = await client.graphql({
+      query: createProblem,
+      variables: { input: problemInput }
+    });
     
     // @ts-ignore
     console.log('GraphQL submission result:', result.data.createProblem);
@@ -62,7 +68,7 @@ export const getProblemHistory = async (): Promise<ProblemEntry[]> => {
   // Example for a GraphQL API
   /*
   try {
-    const problemData = await API.graphql(graphqlOperation(listProblems));
+    const problemData = await client.graphql({ query: listProblems });
     // @ts-ignore
     return problemData.data.listProblems.items;
   } catch (error) {
@@ -93,7 +99,7 @@ export const getAchievements = async (): Promise<Achievement[]> => {
   // This would also be an API call in a real application
   /*
   try {
-    const achievementData = await API.graphql(graphqlOperation(queries.listAchievements));
+    const achievementData = await client.graphql({ query: queries.listAchievements });
     return achievementData.data.listAchievements.items;
   } catch (error) {
     console.error('Error fetching achievements', error);
@@ -132,7 +138,7 @@ export const getUserProgress = async (): Promise<any> => {
   // Once your backend is ready, replace this mock data with a real API call.
   /*
   try {
-    const response = await API.graphql(graphqlOperation(queryUserProgress));
+    const response = await client.graphql({ query: queryUserProgress });
     return response.data.getUserProgress;
   } catch (error) {
     console.error('Error fetching user progress', error);
