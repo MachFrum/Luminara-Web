@@ -12,6 +12,7 @@ import { ConfirmSignUpPage } from './pages/auth/ConfirmSignUpPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { ProgressPage } from './pages/ProgressPage';
+import { ChatPage } from './pages/ChatPage';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 
 const GlobalStyles = css`
@@ -101,6 +102,7 @@ const AppContent: React.FC = () => {
                   <Route path="/learn" element={<Learn />} />
                   <Route path="/progress" element={<ProgressPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/chat" element={<ChatPage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>

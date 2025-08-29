@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { useProblemHistory } from '../hooks/useProblemHistory';
 import { ProblemEntry } from '../types';
@@ -42,6 +43,7 @@ const base64ToFile = (base64: string, filename: string, type: string): File => {
 };
 
 export const Learn: React.FC = () => {
+  const navigate = useNavigate();
   const {
     problems,
     loading,
@@ -137,7 +139,7 @@ export const Learn: React.FC = () => {
         </div>
         <p className="text-lg text-white/80 mt-1">Type or take a picture of any question you might have.</p>
         <div className="flex justify-center items-center gap-8 mt-6">
-            <button className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-full text-white hover:bg-white/10 transition-colors">
+            <button onClick={() => navigate('/chat')} className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-full text-white hover:bg-white/10 transition-colors">
                 <MessageCircle className="w-5 h-5" />
                 <span>Chat</span>
             </button>
