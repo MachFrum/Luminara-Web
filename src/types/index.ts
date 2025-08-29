@@ -28,7 +28,6 @@ export interface ProblemEntry {
   title: string;
   description: string;
   subject: string;
-  difficulty: 'easy' | 'medium' | 'hard';
   tags: string[];
   submittedAt: string;
   solvedAt?: string;
@@ -41,7 +40,6 @@ export interface ProblemSubmissionData {
   title: string;
   description: string;
   subject: string;
-  difficulty: 'easy' | 'medium' | 'hard';
   tags: string[];
   image?: File;
 }

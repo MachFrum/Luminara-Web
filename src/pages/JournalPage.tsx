@@ -42,7 +42,7 @@ export const JournalPage: React.FC = () => {
             </button>
             <button 
               onClick={handleCorrectWithAI} 
-              className="px-4 py-2 rounded-full text-sm font-semibold bg-light-accent text-white border-[1.5px] border-light-accent hover:bg-light-accent/80 transition-colors">
+              className="px-4 py-2 rounded-full text-sm font-semibold bg-light-success text-white border-[1.5px] border-light-success hover:bg-light-success/80 transition-colors">
               Edit with AI
             </button>
           </div>

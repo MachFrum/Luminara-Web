@@ -195,7 +195,7 @@ const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
     <ProgressRing progress={subject.progress} size={50} strokeWidth={5} color="#10B981" />
     <div className="flex-1">
       <p className="font-bold text-light-text dark:text-dark-text">{subject.name}</p>
-      <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{subject.problems}/{subject.totalProblems} problems</p>
+      <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{subject.problems} problems</p>
     </div>
     <ChevronRight className="w-5 h-5 text-light-textSecondary dark:text-dark-textSecondary" />
   </div>
@@ -208,7 +208,6 @@ const GoalCard: React.FC<{ goal: any }> = ({ goal }) => (
       <p className="font-bold text-light-text dark:text-dark-text">{goal.title}</p>
       <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{goal.description}</p>
     </div>
-    <p className="text-sm font-semibold text-light-text dark:text-dark-text">{goal.progress}/{goal.target}</p>
   </div>
 );
 
@@ -219,7 +218,6 @@ const ChallengeCard: React.FC<{ challenge: any }> = ({ challenge }) => (
             <p className="font-bold text-light-text dark:text-dark-text">{challenge.title}</p>
             <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{challenge.questions} questions</p>
         </div>
-        <p className="text-sm font-semibold text-light-text dark:text-dark-text">{challenge.progress}/{challenge.questions}</p>
     </div>
 );
 

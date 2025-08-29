@@ -145,13 +145,11 @@ export const getDashboardData = async (): Promise<any> => {
             id: '1',
             title: 'Quadratic Equation Solution',
             subject: 'Mathematics',
-            difficulty: 'medium',
           },
           {
             id: '2',
             title: 'Chemical Balancing',
             subject: 'Chemistry',
-            difficulty: 'easy',
           },
         ],
         achievements: [

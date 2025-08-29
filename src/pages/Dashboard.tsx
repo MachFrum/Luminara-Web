@@ -18,14 +18,7 @@ interface QuickAction {
   onClick?: () => void;
 }
 
-const getDifficultyClass = (difficulty: string) => {
-  switch (difficulty) {
-    case 'easy': return 'bg-green-500';
-    case 'medium': return 'bg-yellow-500';
-    case 'hard': return 'bg-red-500';
-    default: return 'bg-gray-500';
-  }
-};
+
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -195,7 +188,6 @@ export const Dashboard: React.FC = () => {
                       <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{activity.title}</h3>
                       <p className="text-sm text-light-accent">{activity.subject}</p>
                       <div className="flex items-center justify-end mt-2">
-                        <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${getDifficultyClass(activity.difficulty)}`}>{activity.difficulty}</span>
                       </div>
                     </div>
                     <ChevronRight className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'react-feather';
 import { User } from '../../types';
 
@@ -10,6 +10,7 @@ interface EditProfileModalProps {
 }
 
 export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSubmit }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -20,6 +21,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClos
     language: '',
     school: '',
     grade: '',
+    avatar: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,6 +37,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClos
         language: (user as any).language || '',
         school: (user as any).school || '',
         grade: (user as any).grade || '',
+        avatar: user.avatar || '',
       });
     }
   }, [user]);
@@ -42,6 +45,21 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, avatar: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async () => {
@@ -89,13 +107,30 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClos
           </button>
         </header>
 
-        <div className="p-6 overflow-y-auto space-y-4">
+        <div className="p-6 overflow-y-auto space-y-4 hide-scrollbar">
           <div className="flex justify-center">
             <div className="relative">
-              <div className="w-32 h-32 rounded-[30px] bg-light-surface dark:bg-dark-surface flex items-center justify-center text-4xl font-bold border-2 border-light-border dark:border-dark-border">
-                {user?.firstName?.[0] || 'G'}{user?.lastName?.[0] || 'U'}
+              <div 
+                className="w-32 h-32 rounded-[30px] bg-light-surface dark:bg-dark-surface flex items-center justify-center text-4xl font-bold border-2 border-light-border dark:border-dark-border overflow-hidden"
+                onClick={handleAvatarClick}
+              >
+                {formData.avatar ? (
+                  <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  `${user?.firstName?.[0] || 'G'}${user?.lastName?.[0] || 'U'}`
+                )}
               </div>
-              <button className="absolute bottom-0 right-0 bg-light-accent text-white p-2 rounded-full">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleAvatarChange}
+                className="hidden"
+                accept="image/*"
+              />
+              <button 
+                className="absolute bottom-0 right-0 bg-light-accent text-white p-2 rounded-full"
+                onClick={handleAvatarClick}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
               </button>
             </div>
