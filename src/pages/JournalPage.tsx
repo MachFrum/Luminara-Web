@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Edit, History, CheckCircle, XCircle } from 'react-feather';
+import { Edit, History, CheckCircle, XCircle, X } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
 
 export const JournalPage: React.FC = () => {
+  const navigate = useNavigate();
   const [journalEntry, setJournalEntry] = useState('');
   const [correctedText, setCorrectedText] = useState('');
   const [showCorrection, setShowCorrection] = useState(false);
@@ -30,24 +32,27 @@ export const JournalPage: React.FC = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setActiveTab('new')} 
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTab === 'new' ? 'bg-light-accent text-white' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-semibold border-[1.5px] border-transparent ${activeTab === 'new' ? 'bg-light-accent text-white border-light-accent' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary hover:bg-light-background dark:hover:bg-dark-background hover:border-[#d9c4b0]'}`}>
               New Entry
             </button>
             <button 
               onClick={() => setActiveTab('history')} 
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTab === 'history' ? 'bg-light-accent text-white' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-semibold border-[1.5px] border-transparent ${activeTab === 'history' ? 'bg-light-accent text-white border-light-accent' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary hover:bg-light-background dark:hover:bg-dark-background hover:border-[#d9c4b0]'}`}>
               History
             </button>
             <button 
               onClick={handleCorrectWithAI} 
-              className="px-4 py-2 rounded-full text-sm font-semibold bg-light-accent text-white">
-              Correct with AI
+              className="px-4 py-2 rounded-full text-sm font-semibold bg-light-accent text-white border-[1.5px] border-light-accent hover:bg-light-accent/80 transition-colors">
+              Edit with AI
             </button>
           </div>
+          <button onClick={() => navigate(-1)} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">
+            <X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
+          </button>
         </div>
       </header>
 
-      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl rounded-b-2xl shadow-md p-4 flex flex-grow">
+      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl rounded-b-3xl border-[1.5px] border-[#d9c4b0] shadow-md p-4 flex flex-grow">
         {activeTab === 'new' && (
           <div className={`flex-1 ${showCorrection ? 'w-1/2 pr-2' : 'w-full'}`}>
             <textarea
@@ -65,10 +70,10 @@ export const JournalPage: React.FC = () => {
               <h3 className="font-bold text-lg mb-2">AI Correction:</h3>
               <p>{correctedText}</p>
               <div className="mt-4 flex justify-end gap-2">
-                <button onClick={handleAcceptChanges} className="px-4 py-2 bg-light-accent text-white rounded-full text-sm">
+                <button onClick={handleAcceptChanges} className="px-4 py-2 bg-light-accent text-white rounded-full text-sm border-[1.5px] border-light-accent hover:bg-light-accent/80 transition-colors">
                   <CheckCircle size={16} className="inline-block mr-1" /> Accept
                 </button>
-                <button onClick={handleKeepOriginal} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-full text-sm">
+                <button onClick={handleKeepOriginal} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-full text-sm border-[1.5px] border-gray-300 hover:bg-gray-400 transition-colors">
                   <XCircle size={16} className="inline-block mr-1" /> Keep Original
                 </button>
               </div>

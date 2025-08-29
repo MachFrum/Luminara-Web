@@ -20,13 +20,19 @@ const getTitleFromPath = (path: string) => {
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // New state
   const location = useLocation();
   const title = getTitleFromPath(location.pathname);
 
   return (
     <div className="bg-light-background dark:bg-dark-background min-h-screen">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="lg:ml-72 transition-all duration-300">
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)}
+        isCollapsed={sidebarCollapsed} // Pass to Sidebar
+        setIsCollapsed={setSidebarCollapsed} // Pass to Sidebar
+      />
+      <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'}`}>
         <Header
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}

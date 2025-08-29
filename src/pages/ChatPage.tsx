@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Send, Star, Trash2, Eye, MessageSquare } from 'react-feather';
+import { Send, Star, Trash2, Eye, MessageSquare, X } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
 
 export const ChatPage: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('new');
   const [message, setMessage] = useState('');
   const [chatMessages, setChatMessages] = useState([
@@ -23,24 +25,27 @@ export const ChatPage: React.FC = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setActiveTab('new')} 
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTab === 'new' ? 'bg-light-accent text-white' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-semibold border-[1.5px] border-transparent ${activeTab === 'new' ? 'bg-light-accent text-white border-light-accent' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary hover:bg-light-background dark:hover:bg-dark-background hover:border-[#d9c4b0]'}`}>
               New Chat
             </button>
             <button 
               onClick={() => setActiveTab('history')} 
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTab === 'history' ? 'bg-light-accent text-white' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-semibold border-[1.5px] border-transparent ${activeTab === 'history' ? 'bg-light-accent text-white border-light-accent' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary hover:bg-light-background dark:hover:bg-dark-background hover:border-[#d9c4b0]'}`}>
               History
             </button>
             <button 
               onClick={() => setActiveTab('bookmarks')} 
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTab === 'bookmarks' ? 'bg-light-accent text-white' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-semibold border-[1.5px] border-transparent ${activeTab === 'bookmarks' ? 'bg-light-accent text-white border-light-accent' : 'bg-transparent text-light-textSecondary dark:text-dark-textSecondary hover:bg-light-background dark:hover:bg-dark-background hover:border-[#d9c4b0]'}`}>
               Bookmarks
             </button>
           </div>
+          <button onClick={() => navigate(-1)} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">
+            <X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" />
+          </button>
         </div>
       </header>
 
-      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl rounded-b-2xl shadow-md">
+      <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl rounded-b-3xl border-[1.5px] border-[#d9c4b0] shadow-md">
         {activeTab === 'new' && (
           <div className="p-4">
             <div className="flex flex-col h-[60vh] overflow-y-auto p-4 space-y-4">
@@ -60,7 +65,7 @@ export const ChatPage: React.FC = () => {
                 placeholder="Type your message..."
                 className="flex-1 p-3 bg-light-background dark:bg-dark-background border border-light-border dark:border-dark-border rounded-full focus:outline-none focus:ring-2 focus:ring-light-accent"
               />
-              <button onClick={handleSendMessage} className="p-3 bg-light-accent text-white rounded-full">
+              <button onClick={handleSendMessage} className="p-3 bg-light-accent text-white rounded-full border-[1.5px] border-light-accent hover:bg-light-accent/80 transition-colors">
                 <Send size={20} />
               </button>
             </div>
@@ -74,9 +79,9 @@ export const ChatPage: React.FC = () => {
               <div className="flex items-center justify-between p-3 bg-light-surface dark:bg-dark-surface rounded-lg">
                 <p>Photosynthesis discussion</p>
                 <div className="flex items-center gap-2">
-                  <button className="p-1 hover:bg-light-border dark:hover:bg-dark-border rounded-full"><Eye size={16} /></button>
-                  <button className="p-1 hover:bg-light-border dark:hover:bg-dark-border rounded-full"><Star size={16} /></button>
-                  <button className="p-1 hover:bg-light-border dark:hover:bg-dark-border rounded-full"><Trash2 size={16} /></button>
+                  <button className="p-1 border-[1.5px] border-transparent hover:bg-light-border dark:hover:bg-dark-border hover:border-[#d9c4b0] rounded-full"><Eye size={16} /></button>
+                  <button className="p-1 border-[1.5px] border-transparent hover:bg-light-border dark:hover:bg-dark-border hover:border-[#d9c4b0] rounded-full"><Star size={16} /></button>
+                  <button className="p-1 border-[1.5px] border-transparent hover:bg-light-border dark:hover:bg-dark-border hover:border-[#d9c4b0] rounded-full"><Trash2 size={16} /></button>
                 </div>
               </div>
             </div>

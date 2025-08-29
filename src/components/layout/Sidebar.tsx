@@ -17,11 +17,10 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
-export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void; isCollapsed: boolean; setIsCollapsed: (collapsed: boolean) => void }> = ({ isOpen, onClose, isCollapsed, setIsCollapsed }) => {
   const { logout, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await logout();
