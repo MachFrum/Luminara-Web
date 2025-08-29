@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Star, Trash2, Eye, MessageSquare } from 'react-feather';
 
-const ChatPage: React.FC = () => {
+export const ChatPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('new');
   const [message, setMessage] = useState('');
   const [chatMessages, setChatMessages] = useState([
