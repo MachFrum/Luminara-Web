@@ -32,6 +32,12 @@ export const ProfilePage: React.FC = () => {
     const [showGuestBanner, setShowGuestBanner] = useState(isGuest);
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
     const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+    const [darkModeEnabled, setDarkModeEnabled] = useState(theme === 'dark');
+
+    const handleToggleTheme = () => {
+        toggleTheme();
+        setDarkModeEnabled(!darkModeEnabled);
+    };
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to sign out?')) {
@@ -69,7 +75,7 @@ export const ProfilePage: React.FC = () => {
             title: "Preferences",
             items: [
                 { icon: Bell, label: "Notifications", toggle: true, value: notificationsEnabled, onToggle: () => setNotificationsEnabled(!notificationsEnabled) },
-                { icon: theme === 'light' ? Moon : Sun, label: "Dark Mode", toggle: true, value: theme === 'dark', onToggle: toggleTheme },
+                { icon: theme === 'light' ? Moon : Sun, label: "Dark Mode", toggle: true, value: darkModeEnabled, onToggle: handleToggleTheme },
             ]
         },
         {

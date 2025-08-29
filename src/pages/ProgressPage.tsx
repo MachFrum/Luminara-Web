@@ -82,8 +82,8 @@ export const ProgressPage: React.FC = () => {
             <div className="p-6">
               <SectionHeader title="Activity Overview">
                 <div className="bg-light-border dark:bg-dark-border p-1 rounded-full flex text-sm">
-                  <button onClick={() => setSelectedPeriod('week')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'week' ? 'bg-light-primary text-white dark:bg-dark-primary' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Week</button>
-                  <button onClick={() => setSelectedPeriod('month')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'month' ? 'bg-light-primary text-white dark:bg-dark-primary' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Month</button>
+                  <button onClick={() => setSelectedPeriod('week')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'week' ? 'bg-light-primary text-white dark:bg-dark-primary dark:text-white' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Week</button>
+                  <button onClick={() => setSelectedPeriod('month')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'month' ? 'bg-light-primary text-white dark:bg-dark-primary dark:text-white' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Month</button>
                 </div>
               </SectionHeader>
               <ActivityChart data={progressData.activities} period={selectedPeriod} />
@@ -106,6 +106,16 @@ export const ProgressPage: React.FC = () => {
               <SectionHeader title="Current Goals" />
               <div className="space-y-4">
                 <GoalCard goal={{id: 1, title: 'Solve 10 algebra problems', description: 'Practice makes perfect', progress: 5, target: 10, color: '#10B981'}} />
+              </div>
+            </div>
+          </SectionCard>
+
+          {/* Current Challenges */}
+          <SectionCard>
+            <div className="p-6">
+              <SectionHeader title="Current Challenges" />
+              <div className="space-y-4">
+                <ChallengeCard challenge={{id: 1, title: 'Algebra Basics', questions: 10, progress: 3}} />
               </div>
             </div>
           </SectionCard>
@@ -142,12 +152,13 @@ const ActivityChart: React.FC<{ data: any[], period: string }> = ({ data, period
   const weeklyData = [ { day: 'Mon', hours: 2 }, { day: 'Tue', hours: 3 }, { day: 'Wed', hours: 1 }, { day: 'Thu', hours: 4 }, { day: 'Fri', hours: 2 }, { day: 'Sat', hours: 5 }, { day: 'Sun', hours: 1 }, ];
   const monthlyData = [ { day: 'Week 1', hours: 10 }, { day: 'Week 2', hours: 15 }, { day: 'Week 3', hours: 8 }, { day: 'Week 4', hours: 12 }, ];
   const chartData = period === 'week' ? weeklyData : monthlyData;
+  const maxHours = Math.max(...chartData.map(d => d.hours));
 
   return (
     <div className="h-64 flex items-end justify-around p-4 bg-light-background dark:bg-dark-background rounded-lg">
       {chartData.map((item, index) => (
         <div key={index} className="flex flex-col items-center">
-          <div className="w-8 bg-light-accent rounded-t-lg" style={{ height: `${item.hours * 20}px` }}></div>
+          <div className="w-8 bg-light-accent/50 dark:bg-dark-accent/50 rounded-t-lg backdrop-blur-xl" style={{ height: `${(item.hours / maxHours) * 100}%` }}></div>
           <span className="text-xs text-light-textSecondary dark:text-dark-textSecondary mt-2">{item.day}</span>
         </div>
       ))}
@@ -156,14 +167,16 @@ const ActivityChart: React.FC<{ data: any[], period: string }> = ({ data, period
 };
 
 const SectionCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-md">{children}</div>
+  <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md">{children}</div>
 );
 
 const SectionHeader: React.FC<{ title: string; onSeeAll?: () => void; children?: React.ReactNode }> = ({ title, onSeeAll, children }) => (
-  <div className="flex justify-between items-center mb-4 p-6 pb-0">
+  <div className="flex justify-between items-center mb-4">
     <h2 className="text-xl font-bold text-light-text dark:text-dark-text">{title}</h2>
-    {onSeeAll && <button onClick={onSeeAll} className="text-sm font-semibold text-light-accent">See All</button>}
-    {children}
+    <div className="flex items-center gap-4">
+      {children}
+      {onSeeAll && <button onClick={onSeeAll} className="text-sm font-semibold text-light-accent">See All</button>}
+    </div>
   </div>
 );
 
@@ -206,6 +219,24 @@ const GoalCard: React.FC<{ goal: any }> = ({ goal }) => (
   </div>
 );
 
+const ChallengeCard: React.FC<{ challenge: any }> = ({ challenge }) => (
+    <div className="p-5 bg-light-background dark:bg-dark-background rounded-full border-[1.5px] border-[#d9c4b0]">
+        <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-full bg-light-accent/20 text-light-accent"><Award className="w-5 h-5" /></div>
+            <div>
+                <p className="font-bold text-light-text dark:text-dark-text">{challenge.title}</p>
+                <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{challenge.questions} questions</p>
+            </div>
+        </div>
+        <div className="flex items-center gap-2">
+            <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2">
+                <div className="h-2 rounded-full bg-light-accent" style={{ width: `${(challenge.progress / challenge.questions) * 100}%` }}></div>
+            </div>
+            <p className="text-sm font-semibold text-light-text dark:text-dark-text">{challenge.progress}/{challenge.questions}</p>
+        </div>
+    </div>
+);
+
 const AchievementPill: React.FC<{ achievement: any }> = ({ achievement }) => (
     <div className="flex items-center gap-4 p-3 bg-gradient-to-br from-light-surface/60 to-light-accent/20 dark:from-dark-surface/60 dark:to-dark-accent/20 rounded-full border border-light-border dark:border-dark-border">
         <div className="p-2 rounded-full" style={{ backgroundColor: `${achievement.color}33`, color: achievement.color }}><Award className="w-5 h-5" /></div>
@@ -219,9 +250,9 @@ const AchievementPill: React.FC<{ achievement: any }> = ({ achievement }) => (
 
 const AchievementsModal: React.FC<{ achievements: any[]; onClose: () => void }> = ({ achievements, onClose }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-    <div className="bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[45px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+    <div className="bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[50px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
       <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
-        <h2 className="text-xl font-bold text-light-text dark:text-dark-text">  All Achievements</h2>
+        <h2 className="text-xl font-bold text-light-text dark:text-dark-text">All Achievements</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border"><X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" /></button>
       </header>
       <div className="p-6 overflow-y-auto space-y-4">

@@ -157,7 +157,7 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Quick Actions</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {quickActions.map(action => (
-                  <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
+                  <button key={action.id} onClick={() => action.onClick ? action.onClick() : navigate(action.route)} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md hover:shadow-lg text-left hover:scale-105 transition-transform flex flex-col items-center justify-center">
                     <div className="w-14 h-14 rounded-3xl flex items-center justify-center mb-3 bg-light-surface dark:bg-dark-surface shadow-md">
                       <action.icon className={`w-8 h-8 ${action.color}`} />
                     </div>
@@ -190,7 +190,7 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Activity</h2>
               <div className="space-y-4">
                 {dashboardData?.recentProblems?.map((activity: any) => (
-                  <div key={activity.id} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[45px] border-[1.5px] border-[#d9c4b0] shadow-md flex items-center gap-4">
+                  <div key={activity.id} className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-4 rounded-[45px] border-[1.5px] border-[#d9c4b0] shadow-md hover:shadow-lg flex items-center gap-4">
                     <div className="flex-1">
                       <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{activity.title}</h3>
                       <p className="text-sm text-light-accent">{activity.subject}</p>
@@ -211,7 +211,7 @@ export const Dashboard: React.FC = () => {
             {/* Achievements Progress */}
             <section>
               <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-4">Recent Achievements</h2>
-              <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md space-y-6">
+              <div className="bg-light-surface/30 dark:bg-dark-surface/30 backdrop-blur-xl p-6 rounded-[60px] border-[1.5px] border-[#d9c4b0] shadow-md hover:shadow-lg space-y-6">
                 {dashboardData?.achievements?.map((achievement: any) => (
                   <div key={achievement.id}>
                     <div className="flex items-center">
