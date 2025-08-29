@@ -81,7 +81,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClos
 
   return (
     <div className="fixed inset-0 bg-gray-900/30 dark:bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[40px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
         <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-light-text dark:text-dark-text">Edit Profile</h2>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">
@@ -90,6 +90,16 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClos
         </header>
 
         <div className="p-6 overflow-y-auto space-y-4">
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-[30px] bg-light-surface dark:bg-dark-surface flex items-center justify-center text-4xl font-bold border-2 border-light-border dark:border-dark-border">
+                {user?.firstName?.[0] || 'G'}{user?.lastName?.[0] || 'U'}
+              </div>
+              <button className="absolute bottom-0 right-0 bg-light-accent text-white p-2 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {renderField('First Name', 'firstName', 'Your first name', true)}
             {renderField('Last Name', 'lastName', 'Your last name', true)}

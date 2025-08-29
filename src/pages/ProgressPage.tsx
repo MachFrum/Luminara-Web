@@ -181,7 +181,7 @@ const SectionHeader: React.FC<{ title: string; onSeeAll?: () => void; children?:
 );
 
 const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; color: string }> = ({ icon, label, value, color }) => (
-  <div className="bg-gradient-to-br from-white/20 to-white/5 dark:from-black/20 dark:to-black/5 p-4 rounded-xl flex items-center gap-4 backdrop-blur-sm">
+  <div className="bg-gradient-to-br from-white/20 to-white/5 dark:from-black/20 dark:to-black/5 p-4 rounded-3xl flex items-center gap-4 backdrop-blur-sm">
     <div className="p-2 rounded-full" style={{ backgroundColor: `${color}33`, color }}>{icon}</div>
     <div>
       <p className="text-2xl font-bold text-white"><AnimatedCounter targetValue={value} /></p>
@@ -191,8 +191,8 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; 
 );
 
 const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
-  <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-full border-[1.5px] border-[#d9c4b0]">
-    <ProgressRing progress={subject.progress} size={50} strokeWidth={5} color={subject.color} />
+  <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-[48px] border-[1.5px] border-[#d9c4b0]">
+    <ProgressRing progress={subject.progress} size={50} strokeWidth={5} color="#10B981" />
     <div className="flex-1">
       <p className="font-bold text-light-text dark:text-dark-text">{subject.name}</p>
       <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{subject.problems}/{subject.totalProblems} problems</p>
@@ -202,38 +202,24 @@ const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
 );
 
 const GoalCard: React.FC<{ goal: any }> = ({ goal }) => (
-  <div className="p-5 bg-light-background dark:bg-dark-background rounded-full border-[1.5px] border-[#d9c4b0]">
-    <div className="flex items-center gap-3 mb-3">
-      <div className="p-2 rounded-full bg-light-accent/20 text-light-accent"><Target className="w-5 h-5" /></div>
-      <div>
-        <p className="font-bold text-light-text dark:text-dark-text">{goal.title}</p>
-        <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{goal.description}</p>
-      </div>
+  <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-[48px] border-[1.5px] border-[#d9c4b0]">
+    <ProgressRing progress={(goal.progress / goal.target) * 100} size={50} strokeWidth={5} color="#10B981" />
+    <div className="flex-1">
+      <p className="font-bold text-light-text dark:text-dark-text">{goal.title}</p>
+      <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{goal.description}</p>
     </div>
-    <div className="flex items-center gap-2">
-      <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2">
-        <div className="h-2 rounded-full" style={{ width: `${(goal.progress / goal.target) * 100}%`, backgroundColor: goal.color }}></div>
-      </div>
-      <p className="text-sm font-semibold text-light-text dark:text-dark-text">{goal.progress}/{goal.target}</p>
-    </div>
+    <p className="text-sm font-semibold text-light-text dark:text-dark-text">{goal.progress}/{goal.target}</p>
   </div>
 );
 
 const ChallengeCard: React.FC<{ challenge: any }> = ({ challenge }) => (
-    <div className="p-5 bg-light-background dark:bg-dark-background rounded-full border-[1.5px] border-[#d9c4b0]">
-        <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-full bg-light-accent/20 text-light-accent"><Award className="w-5 h-5" /></div>
-            <div>
-                <p className="font-bold text-light-text dark:text-dark-text">{challenge.title}</p>
-                <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{challenge.questions} questions</p>
-            </div>
+    <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-[48px] border-[1.5px] border-[#d9c4b0]">
+        <ProgressRing progress={(challenge.progress / challenge.questions) * 100} size={50} strokeWidth={5} color="#10B981" />
+        <div className="flex-1">
+            <p className="font-bold text-light-text dark:text-dark-text">{challenge.title}</p>
+            <p className="text-sm text-light-textSecondary dark:text-dark-textSecondary">{challenge.questions} questions</p>
         </div>
-        <div className="flex items-center gap-2">
-            <div className="w-full bg-light-border dark:bg-dark-border rounded-full h-2">
-                <div className="h-2 rounded-full bg-light-accent" style={{ width: `${(challenge.progress / challenge.questions) * 100}%` }}></div>
-            </div>
-            <p className="text-sm font-semibold text-light-text dark:text-dark-text">{challenge.progress}/{challenge.questions}</p>
-        </div>
+        <p className="text-sm font-semibold text-light-text dark:text-dark-text">{challenge.progress}/{challenge.questions}</p>
     </div>
 );
 
@@ -250,7 +236,7 @@ const AchievementPill: React.FC<{ achievement: any }> = ({ achievement }) => (
 
 const AchievementsModal: React.FC<{ achievements: any[]; onClose: () => void }> = ({ achievements, onClose }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-    <div className="bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[50px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+    <div className="bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[50px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
       <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
         <h2 className="text-xl font-bold text-light-text dark:text-dark-text">All Achievements</h2>
         <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border"><X className="w-6 h-6 text-light-textSecondary dark:text-dark-textSecondary" /></button>

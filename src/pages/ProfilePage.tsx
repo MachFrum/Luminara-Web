@@ -27,17 +27,16 @@ const Switch = ({ checked, onChange }: { checked: boolean; onChange: () => void 
 
 export const ProfilePage: React.FC = () => {
     const { user, logout, isGuest, exitGuestMode, updateProfile: updateUserInContext } = useAuth();
-    const { theme, toggleTheme } = useTheme();
+    const { theme, toggleTheme, mode } = useTheme();
     const navigate = useNavigate();
     const [showGuestBanner, setShowGuestBanner] = useState(isGuest);
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
     const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-    const [darkModeEnabled, setDarkModeEnabled] = useState(theme === 'dark');
+    const [darkModeEnabled, setDarkModeEnabled] = useState(mode === 'dark');
 
-    const handleToggleTheme = () => {
-        toggleTheme();
-        setDarkModeEnabled(!darkModeEnabled);
-    };
+    useEffect(() => {
+        setDarkModeEnabled(mode === 'dark');
+    }, [mode]);
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to sign out?')) {
@@ -75,7 +74,7 @@ export const ProfilePage: React.FC = () => {
             title: "Preferences",
             items: [
                 { icon: Bell, label: "Notifications", toggle: true, value: notificationsEnabled, onToggle: () => setNotificationsEnabled(!notificationsEnabled) },
-                { icon: theme === 'light' ? Moon : Sun, label: "Dark Mode", toggle: true, value: darkModeEnabled, onToggle: handleToggleTheme },
+                { icon: theme === 'light' ? Moon : Sun, label: "Dark Mode", toggle: true, value: darkModeEnabled, onToggle: toggleTheme },
             ]
         },
         {
@@ -86,7 +85,7 @@ export const ProfilePage: React.FC = () => {
                 { icon: LogOut, label: "Sign Out", onPress: handleLogout, danger: true },
             ]
         }
-    ], [theme, notificationsEnabled, toggleTheme, handleLogout]);
+    ], [theme, notificationsEnabled, toggleTheme, handleLogout, darkModeEnabled]);
 
     return (
         <div className="bg-light-background dark:bg-dark-background min-h-screen">

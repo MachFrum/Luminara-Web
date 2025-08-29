@@ -146,14 +146,12 @@ export const getDashboardData = async (): Promise<any> => {
             title: 'Quadratic Equation Solution',
             subject: 'Mathematics',
             difficulty: 'medium',
-            submittedAt: new Date(Date.now() - 86400000).toISOString(),
           },
           {
             id: '2',
             title: 'Chemical Balancing',
             subject: 'Chemistry',
             difficulty: 'easy',
-            submittedAt: new Date(Date.now() - 172800000).toISOString(),
           },
         ],
         achievements: [
@@ -162,7 +160,6 @@ export const getDashboardData = async (): Promise<any> => {
             title: 'First Steps',
             progress: 1,
             maxProgress: 1,
-            unlockedAt: new Date(Date.now() - 86400000).toISOString(),
           },
           {
             id: '2',

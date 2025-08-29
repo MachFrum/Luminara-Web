@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Home,
@@ -11,6 +11,8 @@ import {
   Sun,
   LogOut,
   Zap,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'react-feather';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -19,6 +21,7 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ is
   const { logout, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -43,9 +46,9 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ is
       ></div>
 
       <aside
-        className={`fixed top-0 left-0 h-full bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text w-64 lg:w-72 transform transition-transform z-50 ${
+        className={`fixed top-0 left-0 h-full bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text transform transition-all z-50 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        } lg:translate-x-0 ${isCollapsed ? 'w-20' : 'w-64 lg:w-72'}`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -54,7 +57,7 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ is
               <div className="bg-light-accent text-white p-2 rounded-full">
                 <Zap size={24} />
               </div>
-              <h1 className="text-xl lg:text-2xl font-bold">Luminara</h1>
+              {!isCollapsed && <h1 className="text-xl lg:text-2xl font-bold">Luminara</h1>}
             </div>
           </div>
 
@@ -66,20 +69,29 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ is
                 to={item.to}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  `flex items-center gap-3 px-4 py-3 rounded-full transition-colors border-[1.5px] border-transparent ${
                     isActive
-                      ? 'bg-light-accent text-white'
-                      : 'hover:bg-light-background dark:hover:bg-dark-background'
+                      ? 'bg-light-accent text-white border-light-accent'
+                      : 'hover:bg-light-background dark:hover:bg-dark-background hover:border-[#d9c4b0]'
                   }`
                 }
               >
                 {item.icon}
-                <span className="font-medium">{item.text}</span>
+                {!isCollapsed && <span className="font-medium">{item.text}</span>}
               </NavLink>
             ))}
           </nav>
 
-          
+          {/* Collapse/Expand Button */}
+          <div className="p-4 border-t border-light-border dark:border-dark-border">
+            <button 
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="flex items-center gap-3 px-4 py-3 rounded-full transition-colors w-full hover:bg-light-background dark:hover:bg-dark-background"
+            >
+              {isCollapsed ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
+              {!isCollapsed && <span className="font-medium">Collapse</span>}
+            </button>
+          </div>
         </div>
       </aside>
     </>

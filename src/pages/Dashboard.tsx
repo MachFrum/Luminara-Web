@@ -194,8 +194,7 @@ export const Dashboard: React.FC = () => {
                     <div className="flex-1">
                       <h3 className="font-bold text-lg text-light-text dark:text-dark-text">{activity.title}</h3>
                       <p className="text-sm text-light-accent">{activity.subject}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <p className="text-xs text-light-textSecondary dark:text-dark-textSecondary">{new Date(activity.submittedAt).toLocaleDateString()}</p>
+                      <div className="flex items-center justify-end mt-2">
                         <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${getDifficultyClass(activity.difficulty)}`}>{activity.difficulty}</span>
                       </div>
                     </div>
@@ -236,7 +235,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Motivational Quote */}
             <section>
-              <div className="bg-gradient-to-br from-light-deepNavy/30 to-light-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
+              <div className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy/30 dark:to-dark-accent/30 backdrop-blur-xl p-6 rounded-[25px] border-[1.5px] border-[#d9c4b0] shadow-lg text-white">
                 <Star className="w-10 h-10 text-yellow-300 mb-4" />
                 <p className="italic text-lg mb-4">"The beautiful thing about learning is that no one can take it away from you."</p>
                 <p className="font-bold text-right">— B.B. King</p>

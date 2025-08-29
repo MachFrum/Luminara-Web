@@ -30,7 +30,7 @@ export const ChallengesModal: React.FC<ChallengesModalProps> = ({ onClose, onSub
 
   return (
     <div className="fixed inset-0 bg-gray-900/30 dark:bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+      <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-[32px] border-[1.5px] border-[#d9c4b0] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
         <header className="p-4 border-b border-light-border dark:border-dark-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-light-text dark:text-dark-text">Create a Challenge</h2>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-light-border dark:hover:bg-dark-border">
