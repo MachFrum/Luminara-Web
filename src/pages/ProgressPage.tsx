@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
-import { ActivityChart } from '../components/common/ActivityChart';
+
 import { ProgressRing } from '../components/common/ProgressRing';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Target, Heart, Award, X, TrendingUp, ChevronRight, Zap } from 'react-feather';
@@ -54,9 +54,9 @@ export const ProgressPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-light-background dark:bg-dark-background min-h-screen">
+    <div className="bg-light-background dark:bg-dark-background min-h-screen">
       {/* Header */}
-      <header className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white p-6 sm:p-8 rounded-[30px] shadow-lg mb-8">
+      <header className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white p-6 sm:p-8 rounded-b-[32px] shadow-lg mb-8">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-white">Your Progress</h1>
@@ -69,41 +69,44 @@ export const ProgressPage: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard icon={<Award />} label="Challenges" value={progressData.stats.challengesSolved} color="#3B82F6" />
-          <StatCard icon={<Target />} label="Topics" value={progressData.stats.topicsLearned} color="#10B981" />
+          <StatCard icon={<Target />} label="Problems" value={progressData.stats.topicsLearned} color="#10B981" />
           <StatCard icon={<Heart />} label="Goals" value={progressData.stats.goalsDone} color="#EF4444" />
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* Activity Overview */}
           <SectionCard>
-            <SectionHeader title="Activity Overview">
-              <div className="bg-light-border dark:bg-dark-border p-1 rounded-full flex text-sm">
-                <button onClick={() => setSelectedPeriod('week')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'week' ? 'bg-light-primary text-white dark:bg-dark-primary' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Week</button>
-                <button onClick={() => setSelectedPeriod('month')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'month' ? 'bg-light-primary text-white dark:bg-dark-primary' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Month</button>
-              </div>
-            </SectionHeader>
-            <ActivityChart data={progressData.activities} />
+            <div className="p-6">
+              <SectionHeader title="Activity Overview">
+                <div className="bg-light-border dark:bg-dark-border p-1 rounded-full flex text-sm">
+                  <button onClick={() => setSelectedPeriod('week')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'week' ? 'bg-light-primary text-white dark:bg-dark-primary' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Week</button>
+                  <button onClick={() => setSelectedPeriod('month')} className={`px-3 py-1 rounded-full ${selectedPeriod === 'month' ? 'bg-light-primary text-white dark:bg-dark-primary' : 'text-light-textSecondary dark:text-dark-textSecondary'}`}>Month</button>
+                </div>
+              </SectionHeader>
+              <ActivityChart data={progressData.activities} period={selectedPeriod} />
+            </div>
           </SectionCard>
 
           {/* Topic Progress */}
           <SectionCard>
-            <SectionHeader title="Topic Progress" />
-            <div className="space-y-4">
-              {progressData.subjects && Array.isArray(progressData.subjects) ? progressData.subjects.map((subject:any) => <SubjectCard key={subject.id} subject={subject} />) : <div className="text-center py-8">
-    <p className="text-lg text-light-textSecondary dark:text-dark-textSecondary mb-4">Solve your first problem to see your progress here!</p>
-    <button onClick={() => navigate('/learn')} className="px-6 py-2 bg-light-accent text-white rounded-full hover:bg-light-accent/80 transition-colors">Start Learning</button>
-</div>}
+            <div className="p-6">
+              <SectionHeader title="Topic Progress" />
+              <div className="space-y-4">
+                <SubjectCard subject={{id: 1, name: 'Mathematics', progress: 60, problems: 3, totalProblems: 5, color: '#3B82F6'}} />
+              </div>
             </div>
           </SectionCard>
 
           {/* Current Goals */}
           <SectionCard>
-            <SectionHeader title="Current Goals" />
-            <div className="space-y-4">
-              {progressData.goals && Array.isArray(progressData.goals) ? progressData.goals.map((goal:any) => <GoalCard key={goal.id} goal={goal} />) : <p className="text-light-textSecondary dark:text-dark-textSecondary">No current goals.</p>}
+            <div className="p-6">
+              <SectionHeader title="Current Goals" />
+              <div className="space-y-4">
+                <GoalCard goal={{id: 1, title: 'Solve 10 algebra problems', description: 'Practice makes perfect', progress: 5, target: 10, color: '#10B981'}} />
+              </div>
             </div>
           </SectionCard>
         </div>
@@ -111,9 +114,11 @@ export const ProgressPage: React.FC = () => {
         <div className="space-y-8">
           {/* Achievements */}
           <SectionCard>
-            <SectionHeader title="Recent Achievements" onSeeAll={() => setShowAchievementsModal(true)} />
-            <div className="space-y-4">
-              {progressData.achievements && Array.isArray(progressData.achievements) ? progressData.achievements.slice(0, 3).map((ach:any) => <AchievementPill key={ach.id} achievement={ach} />) : <p className="text-light-textSecondary dark:text-dark-textSecondary">No recent achievements.</p>}
+            <div className="p-6">
+              <SectionHeader title="Recent Achievements" onSeeAll={() => setShowAchievementsModal(true)} />
+              <div className="space-y-4">
+                <AchievementPill achievement={{id: 1, title: 'Problem Solver', description: 'Solve your first problem', progress: 1, maxProgress: 1, color: '#EF4444'}} />
+              </div>
             </div>
           </SectionCard>
 
@@ -127,18 +132,35 @@ export const ProgressPage: React.FC = () => {
       </div>
 
       {/* Achievements Modal */}
-      {showAchievementsModal && progressData.achievements && Array.isArray(progressData.achievements) && <AchievementsModal achievements={progressData.achievements} onClose={() => setShowAchievementsModal(false)} />}
+      {showAchievementsModal && <AchievementsModal achievements={[{id: 1, title: 'Problem Solver', description: 'Solve your first problem', progress: 1, maxProgress: 1, color: '#EF4444'}]} onClose={() => setShowAchievementsModal(false)} />}
     </div>
   );
 };
 
 // Helper Components
+const ActivityChart: React.FC<{ data: any[], period: string }> = ({ data, period }) => {
+  const weeklyData = [ { day: 'Mon', hours: 2 }, { day: 'Tue', hours: 3 }, { day: 'Wed', hours: 1 }, { day: 'Thu', hours: 4 }, { day: 'Fri', hours: 2 }, { day: 'Sat', hours: 5 }, { day: 'Sun', hours: 1 }, ];
+  const monthlyData = [ { day: 'Week 1', hours: 10 }, { day: 'Week 2', hours: 15 }, { day: 'Week 3', hours: 8 }, { day: 'Week 4', hours: 12 }, ];
+  const chartData = period === 'week' ? weeklyData : monthlyData;
+
+  return (
+    <div className="h-64 flex items-end justify-around p-4 bg-light-background dark:bg-dark-background rounded-lg">
+      {chartData.map((item, index) => (
+        <div key={index} className="flex flex-col items-center">
+          <div className="w-8 bg-light-accent rounded-t-lg" style={{ height: `${item.hours * 20}px` }}></div>
+          <span className="text-xs text-light-textSecondary dark:text-dark-textSecondary mt-2">{item.day}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const SectionCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="bg-light-surface dark:bg-dark-surface p-6 rounded-2xl shadow-md">{children}</div>
+  <div className="bg-light-surface dark:bg-dark-surface rounded-2xl shadow-md">{children}</div>
 );
 
 const SectionHeader: React.FC<{ title: string; onSeeAll?: () => void; children?: React.ReactNode }> = ({ title, onSeeAll, children }) => (
-  <div className="flex justify-between items-center mb-4">
+  <div className="flex justify-between items-center mb-4 p-6 pb-0">
     <h2 className="text-xl font-bold text-light-text dark:text-dark-text">{title}</h2>
     {onSeeAll && <button onClick={onSeeAll} className="text-sm font-semibold text-light-accent">See All</button>}
     {children}
@@ -156,7 +178,7 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; 
 );
 
 const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
-  <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-[40px] border-[1.5px] border-[#d9c4b0]">
+  <div className="flex items-center gap-4 p-4 bg-light-background dark:bg-dark-background rounded-full border-[1.5px] border-[#d9c4b0]">
     <ProgressRing progress={subject.progress} size={50} strokeWidth={5} color={subject.color} />
     <div className="flex-1">
       <p className="font-bold text-light-text dark:text-dark-text">{subject.name}</p>
@@ -167,7 +189,7 @@ const SubjectCard: React.FC<{ subject: any }> = ({ subject }) => (
 );
 
 const GoalCard: React.FC<{ goal: any }> = ({ goal }) => (
-  <div className="p-5 bg-light-background dark:bg-dark-background rounded-[40px] border-[1.5px] border-[#d9c4b0]">
+  <div className="p-5 bg-light-background dark:bg-dark-background rounded-full border-[1.5px] border-[#d9c4b0]">
     <div className="flex items-center gap-3 mb-3">
       <div className="p-2 rounded-full bg-light-accent/20 text-light-accent"><Target className="w-5 h-5" /></div>
       <div>

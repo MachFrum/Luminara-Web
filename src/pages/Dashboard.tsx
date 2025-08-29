@@ -54,7 +54,7 @@ export const Dashboard: React.FC = () => {
     title: 'Complete Profile',
     description: 'Fill in your mandatory profile details.',
     icon: User,
-    color: 'text-yellow-500',
+    color: 'text-light-accent',
     route: '/profile',
   };
 
@@ -137,7 +137,7 @@ export const Dashboard: React.FC = () => {
             <div className="hidden sm:block w-px h-12 bg-white/30"></div>
 
             <div className="flex items-center justify-center gap-4">
-              <Zap className="w-8 h-8 text-yellow-300" />
+              <Zap className="w-8 h-8 text-white" />
               <div>
                 <p className="text-2xl font-bold text-white">{user?.streak || 0}</p>
                 <p className="text-sm text-white/80">Day Streak</p>

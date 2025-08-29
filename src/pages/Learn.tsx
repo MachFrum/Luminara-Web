@@ -7,7 +7,7 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { PulsingActionButton } from '../components/common/PulsingActionButton';
 import { SubmitProblemModal } from '../components/problems/SubmitProblemModal';
 import { submitProblem } from '../lib/api';
-import { Search, RefreshCw, X, AlertTriangle, UploadCloud } from 'react-feather';
+import { Search, RefreshCw, X, AlertTriangle, UploadCloud, MessageCircle, BookOpen } from 'react-feather';
 
 // Type for submissions that are waiting to be sent
 interface PendingSubmission {
@@ -122,19 +122,30 @@ export const Learn: React.FC = () => {
   return (
     <div className="bg-light-background dark:bg-dark-background min-h-screen">
       <header className="bg-gradient-to-br from-light-deepNavy to-light-accent dark:from-dark-deepNavy dark:to-dark-accent text-white p-6 rounded-b-3xl shadow-lg mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-white">Learning History</h1>
-        <p className="text-lg text-white/80 mt-1">
-          {problems.length} problems solved
-        </p>
-        <div className="relative mt-4">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 z-10" />
-          <input
-            type="text"
-            placeholder="Search problems, topics, or tags..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/20 dark:bg-black/20 text-white placeholder-white/60 backdrop-blur-sm border border-white/30 rounded-full focus:outline-none focus:ring-2 focus:ring-white"
-          />
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">Learn</h1>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 z-10" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-white/20 dark:bg-black/20 text-white placeholder-white/60 backdrop-blur-sm border border-white/30 rounded-full focus:outline-none focus:ring-2 focus:ring-white w-48"
+            />
+          </div>
+        </div>
+        <p className="text-lg text-white/80 mt-1">Type or take a picture of any question you might have.</p>
+        <div className="flex justify-center items-center gap-8 mt-6">
+            <button className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-full text-white hover:bg-white/10 transition-colors">
+                <MessageCircle className="w-5 h-5" />
+                <span>Chat</span>
+            </button>
+            <div className="w-px h-8 bg-white/30"></div>
+            <button className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-full text-white hover:bg-white/10 transition-colors">
+                <BookOpen className="w-5 h-5" />
+                <span>Journal</span>
+            </button>
         </div>
       </header>
 
@@ -226,6 +237,11 @@ export const Learn: React.FC = () => {
                 <p>{selectedProblem.solution || 'No solution available.'}</p>
               </div>
             </div>
+            <footer className="p-4 border-t border-light-border dark:border-dark-border flex justify-end">
+                <button onClick={closeProblemModal} className="px-4 py-2 bg-light-accent text-white rounded-full hover:bg-light-accent/90 transition-colors">
+                    Done
+                </button>
+            </footer>
           </div>
         </div>
       )}

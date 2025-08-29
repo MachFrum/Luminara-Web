@@ -101,20 +101,7 @@ export const ProfilePage: React.FC = () => {
                     )}
                     <p className="text-sm text-white font-semibold mt-1">Level {user?.level || 1} • {user?.rank || 'Beginner'}</p>
                 </div>
-                <div className="mt-6 grid grid-cols-3 divide-x divide-white/30 text-center">
-                    <div className="px-2">
-                        <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.problemsSolved || 0} /></p>
-                        <p className="text-sm text-white/80">Problems Solved</p>
-                    </div>
-                    <div className="px-2">
-                        <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.topicsLearned || 0} /></p>
-                        <p className="text-sm text-white/80">Topics Learned</p>
-                    </div>
-                    <div className="px-2">
-                        <p className="text-2xl font-bold"><AnimatedCounter targetValue={user?.streak || 0} /></p>
-                        <p className="text-sm text-white/80">Day Streak</p>
-                    </div>
-                </div>
+                
             </header>
 
             <main className="p-4 sm:p-6 lg:p-8">
